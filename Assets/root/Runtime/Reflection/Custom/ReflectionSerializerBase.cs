@@ -3,7 +3,6 @@ using System;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
-using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 using com.IvanMurzak.Unity.MCP.Common.Utils;
 
@@ -26,39 +25,20 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             return distance == -1 ? 0 : MAX_DEPTH - distance;
         }
 
-        public virtual SerializedMember Serialize(object obj, bool recursive = true, BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+        public virtual SerializedMember Serialize(object obj, Type? type = null, string? name = null, bool recursive = true,
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
-            var type = obj?.GetType() ?? typeof(T);
+            type ??= obj?.GetType() ?? typeof(T);
 
             if (obj == null)
-                return SerializedMember.FromJson(type, json: null);
+                return SerializedMember.FromJson(type, json: null, name: name);
 
-            var isStruct = type.IsValueType && !type.IsPrimitive && !type.IsEnum;
-
-            if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal) || type == typeof(DateTime))
-            {
-                // Handle as primitive type
-                return SerializedMember.FromPrimitive(type, obj);
-            }
-            if (type.IsEnum)
-            {
-                // Handle as enum type
-                return SerializedMember.FromJson(type, JsonUtils.Serialize(obj));
-            }
-            if (type.IsClass || isStruct)
-            {
-                return recursive
-                    ? new SerializedMember()
-                    {
-                        type = type.FullName,
-                        fields = Serializer.Anything.SerializeFields(obj, flags),
-                        properties = Serializer.Anything.SerializeProperties(obj, flags)
-                    }
-                    : SerializedMember.FromJson(type, JsonUtils.Serialize(obj));
-            }
-
-            throw new ArgumentException($"Unsupported type: {type.FullName}");
+            return InternalSerialize(obj, type, name, recursive, flags);
         }
+
+        protected abstract SerializedMember InternalSerialize(object obj, Type type, string? name = null, bool recursive = true,
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
         public virtual StringBuilder? Populate(ref object obj, SerializedMember data, int depth = 0, StringBuilder? stringBuilder = null, BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
             if (string.IsNullOrEmpty(data.type))

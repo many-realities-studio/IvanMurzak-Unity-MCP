@@ -35,35 +35,61 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
         public SerializedMember? GetField(string name)
             => fields?.FirstOrDefault(x => x.name == name);
 
+        public SerializedMember AddField(SerializedMember field)
+        {
+            fields ??= new List<SerializedMember>();
+            fields.Add(field);
+            return this;
+        }
+
         public SerializedMember? GetProperty(string name)
             => properties?.FirstOrDefault(x => x.name == name);
+
+        public SerializedMember AddProperty(SerializedMember property)
+        {
+            properties ??= new List<SerializedMember>();
+            properties.Add(property);
+            return this;
+        }
 
         public T? GetValue<T>()
         {
             if (valueJsonElement == null)
                 return default;
             var json = valueJsonElement.Value.GetRawText();
-            return JsonSerializer.Deserialize<T>(json) ?? default;
+            return JsonUtils.Deserialize<T>(json) ?? default;
+        }
+        public SerializedMember SetValue(object value)
+        {
+            var json = JsonUtils.Serialize(value);
+            return SetJsonValue(json);
+        }
+        public SerializedMember SetJsonValue(string json)
+        {
+            if (string.IsNullOrEmpty(json))
+            {
+                valueJsonElement = null;
+                return this;
+            }
+            using (var doc = JsonDocument.Parse(json))
+            {
+                valueJsonElement = doc.RootElement.Clone();
+            }
+            return this;
+        }
+        public SerializedMember SetJsonValue(JsonElement jsonElement)
+        {
+            valueJsonElement = jsonElement;
+            return this;
         }
 
         public static SerializedMember FromJson(Type type, string json, string? name = null)
-        {
-            var result = new SerializedMember(type, name);
-            using (var doc = JsonDocument.Parse(json))
-            {
-                result.valueJsonElement = doc.RootElement.Clone();
-            }
-            return result;
-        }
-        public static SerializedMember FromPrimitive(Type type, object primitiveValue, string? name = null)
-        {
-            var result = new SerializedMember(type, name);
-            var json = JsonSerializer.Serialize(primitiveValue);
-            using (var doc = JsonDocument.Parse(json))
-            {
-                result.valueJsonElement = doc.RootElement.Clone();
-            }
-            return result;
-        }
+            => new SerializedMember(type, name).SetJsonValue(json);
+
+        public static SerializedMember FromValue(Type type, object value, string? name = null)
+            => new SerializedMember(type, name).SetValue(value);
+
+        public static SerializedMember FromValue<T>(T value, string? name = null)
+            => new SerializedMember(typeof(T), name).SetValue(value);
     }
 }

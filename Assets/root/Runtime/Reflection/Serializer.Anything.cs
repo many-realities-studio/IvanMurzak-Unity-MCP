@@ -30,7 +30,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal) || type == typeof(DateTime))
                 {
                     // Handle as primitive type
-                    return SerializedMember.FromPrimitive(type, obj, name);
+                    return SerializedMember.FromValue(type, obj, name);
                 }
                 if (type.IsEnum)
                 {

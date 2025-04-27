@@ -41,7 +41,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
             public static string NotFoundComponent(int componentInstanceID, IEnumerable<UnityEngine.Component> allComponents)
             {
                 var availableComponentsPreview = allComponents
-                    .Select(c => MCP.Utils.Serializer.Component.BuildDataLight(c))
+                    .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]", recursive: false))
                     .ToList();
                 var previewJson = JsonUtils.Serialize(availableComponentsPreview);
 
@@ -51,7 +51,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
             {
                 var componentInstanceIDsString = string.Join(", ", componentInstanceIDs);
                 var availableComponentsPreview = allComponents
-                    .Select(c => MCP.Utils.Serializer.Component.BuildDataLight(c))
+                    .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]", recursive: false))
                     .ToList();
                 var previewJson = JsonUtils.Serialize(availableComponentsPreview);
 

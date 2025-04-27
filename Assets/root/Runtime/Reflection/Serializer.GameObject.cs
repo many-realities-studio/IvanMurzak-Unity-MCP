@@ -23,7 +23,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     layer = go.layer,
                     instanceID = go.GetInstanceID(),
                     components = go.GetComponents<UnityEngine.Component>()
-                        .Select(c => Component.BuildData(c))
+                        .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]"))
                         .Where(c => c != null)
                         .ToList()
                 };

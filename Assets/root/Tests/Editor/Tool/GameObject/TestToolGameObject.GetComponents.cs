@@ -16,7 +16,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
 
             var result = new Tool_GameObject().GetComponents(new int[0], instanceID: child.GetInstanceID());
 
-            Debug.Log($"[{nameof(TestToolGameObject)}] GetComponents:\n{result}");
+            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
 
             Assert.IsNotNull(result, $"Result should not be null");
             Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");

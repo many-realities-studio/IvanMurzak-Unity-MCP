@@ -6,6 +6,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     public static class ExtensionsSerializedMember
     {
         public static int GetInstanceID(this SerializedMember member)
-            => member.GetField("instanceID")?.GetValue<int>() ?? 0;
+            => member.GetValue<InstanceID>()?.instanceID
+                ?? member.GetField("instanceID")?.GetValue<int>()
+                ?? 0;
     }
 }

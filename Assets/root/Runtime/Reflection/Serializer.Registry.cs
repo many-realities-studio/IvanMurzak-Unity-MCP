@@ -41,7 +41,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 var serializers = _serializers
                     .Select(s => (s, s.SerializationPriority(type)))
                     .Where(s => s.Item2 > 0)
-                    .OrderBy(s => s.Item2)
+                    .OrderByDescending(s => s.Item2)
                     .Select(s => s.s);
 
                 foreach (var serializer in serializers)
@@ -56,7 +56,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 var serializers = _serializers
                     .Select(s => (s, s.PopulatePriority(type)))
                     .Where(s => s.Item2 > 0)
-                    .OrderBy(s => s.Item2)
+                    .OrderByDescending(s => s.Item2)
                     .Select(s => s.s);
 
                 foreach (var serializer in serializers)

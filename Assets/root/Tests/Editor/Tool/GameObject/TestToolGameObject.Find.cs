@@ -16,6 +16,8 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
 
             var result = new Tool_GameObject().Find(instanceID: child.GetInstanceID());
 
+            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
+
             Assert.IsNotNull(result, $"Result should not be null");
             Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");
             Assert.IsFalse(result.ToLower().Contains("error"), $"{GO_ChildName} should not contain 'error' in the path");
@@ -30,6 +32,8 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
 
             var result = new Tool_GameObject().Find(path: $"{GO_ParentName}/{GO_ChildName}");
 
+            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
+
             Assert.IsNotNull(result, $"Result should not be null");
             Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");
             Assert.IsFalse(result.ToLower().Contains("error"), $"{GO_ChildName} should not contain 'error' in the path");
@@ -43,6 +47,8 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
             var child = new GameObject(GO_ParentName).AddChild(GO_ChildName);
 
             var result = new Tool_GameObject().Find(name: GO_ChildName);
+
+            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
 
             Assert.IsNotNull(result, $"Result should not be null");
             Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");

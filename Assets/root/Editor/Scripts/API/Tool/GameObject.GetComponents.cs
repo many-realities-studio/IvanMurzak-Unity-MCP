@@ -43,7 +43,7 @@ Returns list of all available components preview if no requested components foun
                 : allComponents;
 
             var components = tempComponents
-                    .Select(c => Serializer.Serialize(c))
+                    .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]"))
                     .ToList();
 
             if (components.Count == 0)
