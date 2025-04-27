@@ -27,8 +27,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     {
                         name = name,
                         type = type.FullName,
-                        fields = Serializer.Anything.SerializeFields(obj, flags),
-                        properties = Serializer.Anything.SerializeProperties(obj, flags)
+                        fields = Serializer.SerializeFields(obj, flags),
+                        properties = Serializer.SerializeProperties(obj, flags)
                     }
                     : SerializedMember.FromJson(type, JsonUtils.Serialize(obj), name: name);
             }

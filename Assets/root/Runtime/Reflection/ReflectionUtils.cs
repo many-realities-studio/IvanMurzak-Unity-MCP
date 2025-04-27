@@ -12,40 +12,6 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 {
     public static partial class ReflectionUtils
     {
-        public static StringBuilder Modify(ref object obj, SerializedMember data, StringBuilder stringBuilder = null, int depth = 0,
-            BindingFlags bindingFlags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
-        {
-            stringBuilder ??= new StringBuilder();
-
-            if (string.IsNullOrEmpty(data?.type))
-                return stringBuilder.AppendLine(new string(' ', depth) + Error.DataTypeIsEmpty());
-
-            var type = TypeUtils.GetType(data.type);
-            if (type == null)
-                return stringBuilder.AppendLine(new string(' ', depth) + Error.NotFoundType(data.type));
-
-            if (obj == null)
-                return stringBuilder.AppendLine(new string(' ', depth) + Error.TargetObjectIsNull());
-
-            var castedObj = TypeUtils.CastTo(obj, data.type, out var error);
-            if (error != null)
-                return stringBuilder.AppendLine(new string(' ', depth) + error);
-
-            if (!type.IsAssignableFrom(castedObj.GetType()))
-                return stringBuilder.AppendLine(new string(' ', depth) + Error.TypeMismatch(data.type, obj.GetType().FullName));
-
-            // Modify fields
-            if ((data.fields?.Count ?? 0) > 0)
-                for (var i = 0; i < data.fields.Count; i++)
-                    ModifyField(ref castedObj, data.fields[i], stringBuilder, depth + 1, bindingFlags);
-
-            // Modify properties
-            if ((data.properties?.Count ?? 0) > 0)
-                for (var i = 0; i < data.properties.Count; i++)
-                    ModifyProperty(ref castedObj, data.properties[i], stringBuilder, depth + 1, bindingFlags);
-
-            return stringBuilder;
-        }
 
         public static StringBuilder? ModifyField(ref object obj, SerializedMember fieldValue, StringBuilder? stringBuilder = null, int depth = 0,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -102,7 +68,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     if (error != null)
                         return stringBuilder?.AppendLine(new string(' ', depth) + error);
 
-                    Modify(ref castedObject, fieldValue, stringBuilder, depth + 1, flags);
+                    Serializer.Populate(ref castedObject, fieldValue, stringBuilder, depth + 1, flags);
 
                     fieldInfo.SetValue(obj, castedObject);
                     return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Field '{fieldValue.name}' modified to '{castedObject}'.");
@@ -196,7 +162,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     if (error != null)
                         return stringBuilder?.AppendLine(new string(' ', depth) + error);
 
-                    Modify(ref castedObject, propertyValue, stringBuilder, depth + 1, flags);
+                    Serializer.Populate(ref castedObject, propertyValue, stringBuilder, depth + 1, flags);
 
                     propInfo.SetValue(obj, castedObject);
                     return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Property '{propertyValue.name}' modified to '{castedObject}'.");
