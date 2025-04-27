@@ -4,6 +4,7 @@ using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
+using com.IvanMurzak.Unity.MCP.Common.Utils;
 using com.IvanMurzak.Unity.MCP.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Editor.API
@@ -23,7 +24,7 @@ Each field and property requires to have 'type' and 'name' fields to identify th
 Follow the object schema to specify what to change, ignore values that should not be modified.
 Any unknown or wrong located fields and properties will be ignored.
 Check the result of this command to see what was changed. The ignored fields and properties will not be listed.")]
-            ComponentData data,
+            SerializedMember data,
             [Description("GameObject by 'instanceID' (int). Priority: 1. (Recommended)")]
             int instanceID = 0,
             [Description("GameObject by 'path'. Priority: 2.")]
@@ -44,14 +45,15 @@ Check the result of this command to see what was changed. The ignored fields and
             if (error != null)
                 return error;
 
+            var instanceId = data.GetInstanceID();
             var allComponents = go.GetComponents<UnityEngine.Component>();
-            var component = allComponents.FirstOrDefault(c => c.GetInstanceID() == data.instanceID);
+            var component = allComponents.FirstOrDefault(c => c.GetInstanceID() == instanceId);
             if (component == null)
-                return Error.NotFoundComponent(data.instanceID, allComponents);
+                return Error.NotFoundComponent(instanceId, allComponents);
 
-            var result = ReflectionUtils.Unity.ModifyComponent(component, data);
+            var result = Serializer.Populate(ref component, data);
 
-            return @$"Component with instanceID '{data.instanceID}' modification result:
+            return @$"Component with instanceID '{instanceId}' modification result:
 
 {result.ToString()}
 

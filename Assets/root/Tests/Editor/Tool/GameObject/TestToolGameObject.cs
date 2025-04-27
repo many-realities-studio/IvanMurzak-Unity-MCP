@@ -9,6 +9,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
 {
     public partial class TestToolGameObject
     {
+        const string GO_ParentName = "root";
+        const string GO_ChildName = "nestedGo";
+
         [UnitySetUp]
         public IEnumerator SetUp()
         {
@@ -19,22 +22,6 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
         public IEnumerator TearDown()
         {
             Debug.Log($"[{nameof(TestToolGameObject)}] TearDown");
-            yield return null;
-        }
-
-        [UnityTest]
-        public IEnumerator FindByPath()
-        {
-            var parentName = "root";
-            var childName = "nestedGo";
-            var child = new GameObject(parentName).AddChild(childName);
-
-            var path = new Tool_GameObject().Find(name: childName);
-
-            Assert.IsNotNull(path, $"{childName} should not be null");
-            Assert.IsTrue(path.Contains(childName), $"{childName} should be found in the path");
-            Assert.IsFalse(path.ToLower().Contains("error"), $"{childName} should not contain 'error' in the path");
-
             yield return null;
         }
     }

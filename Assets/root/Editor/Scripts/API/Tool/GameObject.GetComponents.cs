@@ -1,4 +1,6 @@
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+using System.Collections;
+using System.Collections.Generic;
 using System.ComponentModel;
 using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
@@ -33,10 +35,16 @@ Returns list of all available components preview if no requested components foun
                 return error;
 
             var allComponents = go.GetComponents<UnityEngine.Component>();
-            var components = allComponents
-                .Where(c => componentInstanceIDs == null || componentInstanceIDs.Length == 0 || componentInstanceIDs.Contains(c.GetInstanceID()))
-                .Select(c => Serializer.Component.BuildData(c))
-                .ToList();
+
+            var needToFilterComponents = componentInstanceIDs != null && componentInstanceIDs.Length > 0;
+
+            var tempComponents = needToFilterComponents
+                ? allComponents.Where(c => componentInstanceIDs.Contains(c.GetInstanceID()))
+                : allComponents;
+
+            var components = tempComponents
+                    .Select(c => Serializer.Serialize(c))
+                    .ToList();
 
             if (components.Count == 0)
                 return Error.NotFoundComponents(componentInstanceIDs, allComponents);

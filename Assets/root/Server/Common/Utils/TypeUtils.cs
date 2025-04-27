@@ -2,7 +2,7 @@
 using System;
 using System.Linq;
 
-namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
+namespace com.IvanMurzak.Unity.MCP.Common.Utils
 {
     public static class TypeUtils
     {
@@ -45,6 +45,20 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
 
             error = null;
             return obj;
+        }
+        public static int GetInheritanceDistance(Type baseType, Type targetType)
+        {
+            if (!baseType.IsAssignableFrom(targetType))
+                return -1;
+
+            int distance = 0;
+            Type? current = targetType;
+            while (current != null && current != baseType)
+            {
+                current = current.BaseType;
+                distance++;
+            }
+            return current == baseType ? distance : -1;
         }
     }
 }

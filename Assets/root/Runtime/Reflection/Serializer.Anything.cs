@@ -23,19 +23,19 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 type ??= obj?.GetType();
 
                 if (obj == null)
-                    return SerializedMember.FromJson(name, type, null);
+                    return SerializedMember.FromJson(type, null, name);
 
                 var isStruct = type.IsValueType && !type.IsPrimitive && !type.IsEnum;
 
                 if (type.IsPrimitive || type == typeof(string) || type == typeof(decimal) || type == typeof(DateTime))
                 {
                     // Handle as primitive type
-                    return SerializedMember.FromPrimitive(name, type, obj);
+                    return SerializedMember.FromPrimitive(type, obj, name);
                 }
                 if (type.IsEnum)
                 {
                     // Handle as enum type
-                    return SerializedMember.FromJson(name, type, JsonUtils.Serialize(obj));
+                    return SerializedMember.FromJson(type, JsonUtils.Serialize(obj), name);
                 }
                 if (type.IsClass)
                 {
@@ -57,15 +57,15 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                         {
                             var unityObject = obj as UnityEngine.Object;
                             var instanceIDJson = JsonUtility.ToJson(new InstanceID(unityObject.GetInstanceID()));
-                            return SerializedMember.FromJson(name, type, instanceIDJson);
+                            return SerializedMember.FromJson(type, instanceIDJson, name);
                         }
-                        return SerializedMember.FromJson(name, type, JsonUtility.ToJson(obj));
+                        return SerializedMember.FromJson(type, JsonUtility.ToJson(obj), name);
                     }
                 }
                 if (isStruct)
                 {
                     // Handle as struct type
-                    return SerializedMember.FromJson(name, type, JsonUtility.ToJson(obj));
+                    return SerializedMember.FromJson(type, JsonUtility.ToJson(obj), name);
                 }
 
                 throw new ArgumentException($"Unsupported type: {type.FullName}");

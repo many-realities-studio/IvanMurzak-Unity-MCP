@@ -1,6 +1,6 @@
 using System.Text;
 using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
-using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
+using com.IvanMurzak.Unity.MCP.Common.Utils;
 using UnityEngine;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
