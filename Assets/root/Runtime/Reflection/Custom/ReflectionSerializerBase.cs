@@ -28,7 +28,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
         public virtual SerializedMember Serialize(object obj, bool recursive = true, BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
-            var type = typeof(T);
+            var type = obj?.GetType() ?? typeof(T);
 
             if (obj == null)
                 return SerializedMember.FromJson(type, json: null);
