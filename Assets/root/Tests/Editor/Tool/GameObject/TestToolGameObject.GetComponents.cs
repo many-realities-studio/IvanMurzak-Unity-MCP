@@ -12,16 +12,12 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
         [UnityTest]
         public IEnumerator GetComponents()
         {
-            var child = new GameObject(GO_ParentName).AddChild(GO_ChildName);
+            var child = new GameObject(GO_ParentName).AddChild(GO_Child1Name);
 
             var result = new Tool_GameObject().GetComponents(new int[0], instanceID: child.GetInstanceID());
+            ResultValidation(result);
 
-            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
-
-            Assert.IsNotNull(result, $"Result should not be null");
-            Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");
-            Assert.IsFalse(result.ToLower().Contains("error"), $"{GO_ChildName} should not contain 'error' in the path");
-
+            Assert.IsTrue(result.Contains(GO_Child1Name), $"{GO_Child1Name} should be found in the path");
             yield return null;
         }
     }

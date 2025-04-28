@@ -13,7 +13,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
         [UnityTest]
         public IEnumerator ModifyComponent_Vector3()
         {
-            var child = new GameObject(GO_ParentName).AddChild(GO_ChildName);
+            var child = new GameObject(GO_ParentName).AddChild(GO_Child1Name);
             var newPosition = new Vector3(1, 2, 3);
 
             var data = SerializedMember.FromValue(name: nameof(child.transform),
@@ -24,16 +24,33 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                     value: newPosition));
 
             var result = new Tool_GameObject().ModifyComponent(data, instanceID: child.GetInstanceID());
+            ResultValidation(result);
 
-            Debug.Log($"[{nameof(TestToolGameObject)}] Result:\n{result}");
-
-            Assert.IsNotNull(result, $"Result should not be null");
-            Assert.IsTrue(result.Contains(GO_ChildName), $"{GO_ChildName} should be found in the path");
-            Assert.IsFalse(result.ToLower().Contains("error"), $"{GO_ChildName} should not contain 'error' in the path");
-
+            Assert.IsTrue(result.Contains(GO_Child1Name), $"{GO_Child1Name} should be found in the path");
             Assert.AreEqual(child.transform.position, newPosition, "Position should be changed");
             Assert.AreEqual(child.transform.GetInstanceID(), data.GetInstanceID(), "InstanceID should be the same");
+            yield return null;
+        }
+        [UnityTest]
+        public IEnumerator ModifyComponent_Material()
+        {
+            var material = new Material(Shader.Find("Standard"));
 
+            var go = new GameObject(GO_ParentName);
+            var component = go.AddComponent<MeshRenderer>();
+
+            var data = SerializedMember.FromValue(name: "",
+                    type: typeof(MeshRenderer),
+                    value: new InstanceID(component.GetInstanceID())
+                )
+                .AddProperty(SerializedMember.FromValue(name: nameof(component.sharedMaterial),
+                    value: material));
+
+            var result = new Tool_GameObject().ModifyComponent(data, instanceID: go.GetInstanceID());
+            ResultValidation(result);
+
+            Assert.IsTrue(result.Contains(GO_Child1Name), $"{GO_Child1Name} should be found in the path");
+            Assert.AreEqual(component.material.GetInstanceID(), material.GetInstanceID(), "Materials InstanceIDs should be the same.");
             yield return null;
         }
     }
