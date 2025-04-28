@@ -54,14 +54,36 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             obj = parsedValue;
             return true;
         }
-        protected override bool SetFieldValue(ref object obj, Type type, FieldInfo fieldInfo, object? value)
+
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            fieldInfo.SetValue(obj, value);
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            fieldInfo.SetValue(obj, parsedValue);
             return true;
         }
-        protected override bool SetPropertyValue(ref object obj, Type type, PropertyInfo propertyInfo, object? value)
+
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            propertyInfo.SetValue(obj, value);
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            propertyInfo.SetValue(obj, parsedValue);
+            return true;
+        }
+
+        public override bool SetField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            fieldInfo.SetValue(obj, parsedValue);
+            return true;
+        }
+
+        public override bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            propertyInfo.SetValue(obj, parsedValue);
             return true;
         }
     }

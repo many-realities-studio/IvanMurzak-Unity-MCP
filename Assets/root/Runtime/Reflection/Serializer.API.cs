@@ -56,5 +56,33 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             return stringBuilder;
         }
+
+        public static StringBuilder PopulateAsProperty(ref object obj, PropertyInfo propertyInfo, SerializedMember data, StringBuilder stringBuilder = null, int depth = 0,
+            BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
+        {
+            stringBuilder ??= new StringBuilder();
+
+            if (string.IsNullOrEmpty(data?.type))
+                return stringBuilder.AppendLine(new string(' ', depth) + Error.DataTypeIsEmpty());
+
+            var type = TypeUtils.GetType(data.type);
+            if (type == null)
+                return stringBuilder.AppendLine(new string(' ', depth) + Error.NotFoundType(data.type));
+
+            if (obj == null)
+                return stringBuilder.AppendLine(new string(' ', depth) + Error.TargetObjectIsNull());
+
+            TypeUtils.CastTo(obj, data.type, out var error);
+            if (error != null)
+                return stringBuilder.AppendLine(new string(' ', depth) + error);
+
+            if (!type.IsAssignableFrom(obj.GetType()))
+                return stringBuilder.AppendLine(new string(' ', depth) + Error.TypeMismatch(data.type, obj.GetType().FullName));
+
+            foreach (var populators in Registry.BuildPopulatorsChain(type))
+                populators.Populate(ref obj, data, stringBuilder: stringBuilder, flags: flags);
+
+            return stringBuilder;
+        }
     }
 }

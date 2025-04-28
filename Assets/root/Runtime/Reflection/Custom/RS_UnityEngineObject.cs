@@ -2,8 +2,8 @@
 using System;
 using System.Reflection;
 using System.Text.Json;
+using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
-using UnityEngine;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
@@ -11,10 +11,6 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     {
         protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var isStruct = type.IsValueType && !type.IsPrimitive && !type.IsEnum;
-            if (isStruct)
-                return SerializedMember.FromJson(type, JsonUtility.ToJson(obj), name);
-
             var unityObject = obj as UnityEngine.Object;
             if (type.IsClass)
             {
@@ -30,8 +26,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 }
                 else
                 {
-                    var instanceIDJson = JsonUtility.ToJson(new InstanceID(unityObject.GetInstanceID()));
-                    return SerializedMember.FromJson(type, instanceIDJson, name);
+                    var instanceID = new InstanceID(unityObject.GetInstanceID());
+                    return SerializedMember.FromValue(type, instanceID, name);
                 }
             }
 
@@ -42,14 +38,24 @@ namespace com.IvanMurzak.Unity.MCP.Utils
         {
             return true;
         }
-        protected override bool SetFieldValue(ref object obj, Type type, FieldInfo fieldInfo, object? value)
+
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            fieldInfo.SetValue(obj, value);
+            var instanceID = JsonUtils.Deserialize<InstanceID>(value.Value.GetRawText());
+            var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
+
+            fieldInfo.SetValue(obj, refObj);
             return true;
         }
-        protected override bool SetPropertyValue(ref object obj, Type type, PropertyInfo propertyInfo, object? value)
+
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            propertyInfo.SetValue(obj, value);
+            var instanceID = JsonUtils.Deserialize<InstanceID>(value.Value.GetRawText());
+            var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
+
+            propertyInfo.SetValue(obj, refObj);
             return true;
         }
     }

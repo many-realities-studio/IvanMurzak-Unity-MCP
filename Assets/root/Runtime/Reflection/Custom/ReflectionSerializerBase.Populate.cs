@@ -1,12 +1,11 @@
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 using com.IvanMurzak.Unity.MCP.Common.Utils;
+using static com.IvanMurzak.Unity.MCP.Utils.Serializer;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
@@ -74,9 +73,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             try
             {
-                var currentValue = fieldInfo.GetValue(obj);
-                Serializer.Populate(ref currentValue, fieldValue, stringBuilder: stringBuilder, depth: depth + 1, flags: flags);
-                SetFieldValue(ref obj, targetType, fieldInfo, currentValue);
+                foreach (var populators in Registry.BuildPopulatorsChain(targetType))
+                    populators.SetAsField(ref obj, targetType, fieldInfo, value: fieldValue.valueJsonElement, flags: flags);
 
                 return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Field '{fieldValue.name}' modified to '{fieldValue.valueJsonElement}'.");
             }
@@ -86,7 +84,6 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 return stringBuilder?.AppendLine(new string(' ', depth) + message);
             }
         }
-        protected abstract bool SetFieldValue(ref object obj, Type type, FieldInfo propertyInfo, object? value);
 
         protected virtual StringBuilder? ModifyProperty(ref object obj, SerializedMember propertyValue, StringBuilder? stringBuilder = null, int depth = 0,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -115,9 +112,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             try
             {
-                var currentValue = propInfo.GetValue(obj);
-                Serializer.Populate(ref currentValue, propertyValue, stringBuilder: stringBuilder, depth: depth + 1, flags: flags);
-                SetPropertyValue(ref obj, targetType, propInfo, currentValue);
+                foreach (var populators in Registry.BuildPopulatorsChain(targetType))
+                    populators.SetAsProperty(ref obj, targetType, propInfo, value: propertyValue.valueJsonElement, flags: flags);
 
                 return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Property '{propertyValue.name}' modified to '{propertyValue.valueJsonElement}'.");
             }
@@ -127,6 +123,17 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 return stringBuilder?.AppendLine(new string(' ', depth) + message);
             }
         }
-        protected abstract bool SetPropertyValue(ref object obj, Type type, PropertyInfo propertyInfo, object? value);
+
+        public abstract bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        public abstract bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        public abstract bool SetField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+        public abstract bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
     }
 }
