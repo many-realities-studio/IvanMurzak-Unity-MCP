@@ -1,9 +1,12 @@
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
+using UnityEngine;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
@@ -27,14 +30,23 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     {
                         name = name,
                         type = type.FullName,
-                        fields = Serializer.SerializeFields(obj, flags),
-                        properties = Serializer.SerializeProperties(obj, flags)
+                        fields = SerializeFields(obj, flags),
+                        properties = SerializeProperties(obj, flags)
                     }
                     : SerializedMember.FromJson(type, JsonUtils.Serialize(obj), name: name);
             }
 
             throw new ArgumentException($"Unsupported type: {type.FullName}");
         }
+        protected override IEnumerable<FieldInfo> GetSerializableFields(Type objType, BindingFlags flags)
+            => objType.GetFields(flags)
+                .Where(field => field.GetCustomAttribute<ObsoleteAttribute>() == null)
+                .Where(field => field.IsPublic || field.IsPrivate && field.GetCustomAttribute<SerializeField>() != null);
+
+        protected override IEnumerable<PropertyInfo> GetSerializableProperties(Type objType, BindingFlags flags)
+            => objType.GetProperties(flags)
+                .Where(prop => prop.GetCustomAttribute<ObsoleteAttribute>() == null)
+                .Where(prop => prop.CanRead);
 
         protected override bool SetValue(ref object obj, Type type, JsonElement? value)
         {
@@ -42,16 +54,14 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             obj = parsedValue;
             return true;
         }
-        protected override bool SetFieldValue(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value)
+        protected override bool SetFieldValue(ref object obj, Type type, FieldInfo fieldInfo, object? value)
         {
-            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
-            fieldInfo.SetValue(obj, parsedValue);
+            fieldInfo.SetValue(obj, value);
             return true;
         }
-        protected override bool SetPropertyValue(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value)
+        protected override bool SetPropertyValue(ref object obj, Type type, PropertyInfo propertyInfo, object? value)
         {
-            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
-            propertyInfo.SetValue(obj, parsedValue);
+            propertyInfo.SetValue(obj, value);
             return true;
         }
     }

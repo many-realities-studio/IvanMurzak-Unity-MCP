@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
-using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 using com.IvanMurzak.Unity.MCP.Common.Utils;
 using com.IvanMurzak.Unity.MCP.Utils;
@@ -51,7 +50,8 @@ Check the result of this command to see what was changed. The ignored fields and
             if (component == null)
                 return Error.NotFoundComponent(instanceId, allComponents);
 
-            var result = Serializer.Populate(ref component, data);
+            var componentObject = (object)component;
+            var result = Serializer.Populate(ref componentObject, data);
 
             return @$"Component with instanceID '{instanceId}' modification result:
 
