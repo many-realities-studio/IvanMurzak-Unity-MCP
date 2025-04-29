@@ -11,12 +11,14 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 ?? 0;
         public static bool GetIndexFromName(this SerializedMember member, out int index)
         {
-            if (member.name?.Length < 3)
+            if (HasIndexName(member) == false)
             {
                 index = -1;
                 return false;
             }
             return int.TryParse(member.name.Substring(1, member.name.Length - 2), out index);
         }
+        public static bool HasIndexName(this SerializedMember member)
+            => member.name?.Length >= 3 && member.name[0] == '[' && member.name[^1] == ']';
     }
 }
