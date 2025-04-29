@@ -43,7 +43,7 @@ Also, it returns Components preview just for the target GameObject."
                     .ToList();
 
                 return @$"[Success] Found GameObject.
-# Components preview:
+# Components preview (to get full information use 'GameObject_GetComponents' tool):
 {JsonUtils.Serialize(componentsPreview)}
 
 # GameObject bounds:
