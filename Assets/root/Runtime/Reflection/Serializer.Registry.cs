@@ -17,7 +17,9 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             {
                 // Register default serializers
                 Add(new RS_Generic<object>());
+                Add(new RS_Array());
                 Add(new RS_UnityEngineObject());
+                Add(new RS_Material());
             }
 
             public static void Add(IReflectionSerializer serializer)

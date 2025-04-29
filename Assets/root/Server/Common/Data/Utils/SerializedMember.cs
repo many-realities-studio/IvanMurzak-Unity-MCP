@@ -35,6 +35,20 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
         public SerializedMember? GetField(string name)
             => fields?.FirstOrDefault(x => x.name == name);
 
+        public SerializedMember SetFieldValue<T>(string name, T value)
+        {
+            var field = GetField(name);
+            if (field == null)
+            {
+                field = SerializedMember.FromValue(typeof(T), value, name: name);
+                fields ??= new List<SerializedMember>();
+                fields.Add(field);
+                return this;
+            }
+            field.SetValue(value);
+            return this;
+        }
+
         public SerializedMember AddField(SerializedMember field)
         {
             fields ??= new List<SerializedMember>();
@@ -44,6 +58,20 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
 
         public SerializedMember? GetProperty(string name)
             => properties?.FirstOrDefault(x => x.name == name);
+
+        public SerializedMember SetPropertyValue<T>(string name, T value)
+        {
+            var property = GetProperty(name);
+            if (property == null)
+            {
+                property = SerializedMember.FromValue(typeof(T), value, name: name);
+                properties ??= new List<SerializedMember>();
+                properties.Add(property);
+                return this;
+            }
+            property.SetValue(value);
+            return this;
+        }
 
         public SerializedMember AddProperty(SerializedMember property)
         {
@@ -82,6 +110,9 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
             valueJsonElement = jsonElement;
             return this;
         }
+
+        public static SerializedMember FromJson(Type type, JsonElement json, string? name = null)
+            => new SerializedMember(type, name).SetJsonValue(json);
 
         public static SerializedMember FromJson(Type type, string json, string? name = null)
             => new SerializedMember(type, name).SetJsonValue(json);

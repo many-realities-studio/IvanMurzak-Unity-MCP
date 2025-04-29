@@ -45,8 +45,15 @@ Check the result of this command to see what was changed. The ignored fields and
                 return error;
 
             var instanceId = data.GetInstanceID();
+            data.GetIndexFromName(out var index);
+
             var allComponents = go.GetComponents<UnityEngine.Component>();
-            var component = allComponents.FirstOrDefault(c => c.GetInstanceID() == instanceId);
+            var component = instanceId == 0
+                ? index >= 0 && index < allComponents.Length
+                    ? allComponents[index]
+                    : null
+                : allComponents.FirstOrDefault(c => c.GetInstanceID() == instanceId);
+
             if (component == null)
                 return Error.NotFoundComponent(instanceId, allComponents);
 

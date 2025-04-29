@@ -9,5 +9,14 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             => member.GetValue<InstanceID>()?.instanceID
                 ?? member.GetField("instanceID")?.GetValue<int>()
                 ?? 0;
+        public static bool GetIndexFromName(this SerializedMember member, out int index)
+        {
+            if (member.name?.Length < 3)
+            {
+                index = -1;
+                return false;
+            }
+            return int.TryParse(member.name.Substring(1, member.name.Length - 2), out index);
+        }
     }
 }

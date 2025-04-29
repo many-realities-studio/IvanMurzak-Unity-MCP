@@ -14,6 +14,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
         {
             var child = new GameObject(GO_ParentName).AddChild(GO_Child1Name);
 
+            var meshRenderer = child.AddComponent<MeshRenderer>();
+            meshRenderer.sharedMaterial = new Material(Shader.Find("Standard"));
+
             var result = new Tool_GameObject().GetComponents(new int[0], instanceID: child.GetInstanceID());
             ResultValidation(result);
 

@@ -44,12 +44,13 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                     value: new InstanceID(component.GetInstanceID())
                 )
                 .AddProperty(SerializedMember.FromValue(name: nameof(component.sharedMaterial),
-                    value: material));
+                    type: typeof(Material),
+                    value: new InstanceID(material.GetInstanceID())));
 
             var result = new Tool_GameObject().ModifyComponent(data, instanceID: go.GetInstanceID());
             ResultValidation(result);
 
-            Assert.IsTrue(result.Contains(GO_Child1Name), $"{GO_Child1Name} should be found in the path");
+            Assert.IsTrue(result.Contains(GO_ParentName), $"{GO_ParentName} should be found in the path");
             Assert.AreEqual(component.material.GetInstanceID(), material.GetInstanceID(), "Materials InstanceIDs should be the same.");
             yield return null;
         }
