@@ -11,11 +11,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     {
         public virtual int SerializationPriority(Type type)
         {
-            var distance = TypeUtils.GetInheritanceDistance(baseType: typeof(T), targetType: type);
-            return distance == -1 ? 0 : MAX_DEPTH - distance;
-        }
-        public virtual int PopulatePriority(Type type)
-        {
+            if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
+                return 0;
             var distance = TypeUtils.GetInheritanceDistance(baseType: typeof(T), targetType: type);
             return distance == -1 ? 0 : MAX_DEPTH - distance;
         }

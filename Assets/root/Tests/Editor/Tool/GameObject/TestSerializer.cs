@@ -45,5 +45,33 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
 
             yield return null;
         }
+
+
+        [UnityTest]
+        public IEnumerator SerializeMaterialArray()
+        {
+            var material1 = new Material(Shader.Find("Standard"));
+            var material2 = new Material(Shader.Find("Standard"));
+
+            var materials = new[] { material1, material2 };
+
+            var serialized = Serializer.Serialize(materials);
+            var json = JsonUtils.Serialize(serialized);
+            Debug.Log($"[{nameof(TestSerializer)}] Result:\n{json}");
+
+            // var glossinessValue = 1.0f;
+            // var colorValue = new Color(1.0f, 0.0f, 0.0f, 0.5f);
+
+            // serialized.SetPropertyValue("_Glossiness", glossinessValue);
+            // serialized.SetPropertyValue("_Color", colorValue);
+
+            // var objMaterial = (object)material;
+            // Serializer.Populate(ref objMaterial, serialized);
+
+            // Assert.AreEqual(glossinessValue, material.GetFloat("_Glossiness"), 0.001f, $"Material property '_Glossiness' should be {glossinessValue}.");
+            // Assert.AreEqual(colorValue, material.GetColor("_Color"), $"Material property '_Glossiness' should be {glossinessValue}.");
+
+            yield return null;
+        }
     }
 }

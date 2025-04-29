@@ -19,7 +19,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 Add(new RS_Generic<object>());
                 Add(new RS_Array());
                 Add(new RS_UnityEngineObject());
-                Add(new RS_Material());
+                Add(new RS_UnityEngineTransform());
+                Add(new RS_UnityEngineMaterial());
             }
 
             public static void Add(IReflectionSerializer serializer)

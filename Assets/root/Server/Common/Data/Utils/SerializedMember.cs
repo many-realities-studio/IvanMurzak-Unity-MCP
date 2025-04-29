@@ -87,7 +87,7 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
             var json = valueJsonElement.Value.GetRawText();
             return JsonUtils.Deserialize<T>(json) ?? default;
         }
-        public SerializedMember SetValue(object value)
+        public SerializedMember SetValue(object? value)
         {
             var json = JsonUtils.Serialize(value);
             return SetJsonValue(json);
@@ -117,10 +117,10 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
         public static SerializedMember FromJson(Type type, string json, string? name = null)
             => new SerializedMember(type, name).SetJsonValue(json);
 
-        public static SerializedMember FromValue(Type type, object value, string? name = null)
+        public static SerializedMember FromValue(Type type, object? value, string? name = null)
             => new SerializedMember(type, name).SetValue(value);
 
-        public static SerializedMember FromValue<T>(T value, string? name = null)
+        public static SerializedMember FromValue<T>(T? value, string? name = null)
             => new SerializedMember(typeof(T), name).SetValue(value);
     }
 }

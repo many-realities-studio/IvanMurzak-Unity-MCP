@@ -2,7 +2,6 @@
 using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
@@ -12,7 +11,7 @@ using UnityEngine;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
-    public partial class RS_Material : RS_Generic<Material>
+    public partial class RS_UnityEngineMaterial : RS_Generic<Material>
     {
         protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
