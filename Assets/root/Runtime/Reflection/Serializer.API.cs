@@ -22,7 +22,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             foreach (var serializer in Registry.BuildSerializersChain(type))
             {
-                UnityEngine.Debug.Log($"[Serializer] {serializer.GetType().Name} for type {type?.FullName}");
+                // UnityEngine.Debug.Log($"[Serializer] {serializer.GetType().Name} for type {type?.FullName}");
                 var serializedMember = serializer.Serialize(obj, type: type, name: name, recursive, flags);
                 if (serializedMember != null)
                     return serializedMember;
