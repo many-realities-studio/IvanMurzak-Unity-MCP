@@ -9,11 +9,12 @@ namespace com.IvanMurzak.Unity.MCP.Server
 {
     public class LocalServer : BaseHub<LocalServer>, ILocalServer
     {
-        readonly Subject<Unit> _onListToolUpdated = new();
+        static readonly Subject<Unit> _onListToolUpdated = new();
         public Observable<Unit> OnListToolUpdated => _onListToolUpdated;
 
-        readonly Subject<Unit> _onListResourcesUpdated = new();
+        static readonly Subject<Unit> _onListResourcesUpdated = new();
         public Observable<Unit> OnListResourcesUpdated => _onListResourcesUpdated;
+
 
         public LocalServer(ILogger<LocalServer> logger, IHubContext<LocalServer> hubContext) : base(logger, hubContext)
         {
@@ -21,23 +22,16 @@ namespace com.IvanMurzak.Unity.MCP.Server
 
         public Task<IResponseData<string>> SetOnListToolsUpdated(string data)
         {
-            _logger.LogTrace("SetOnListToolsUpdated. Data: {0}", data);
+            _logger.LogTrace("LocalServer SetOnListToolsUpdated. {0}. Data: {1}", _guid, data);
             _onListToolUpdated.OnNext(Unit.Default);
             return ResponseData<string>.Success(data, string.Empty).TaskFromResult();
         }
 
         public Task<IResponseData<string>> SetOnListResourcesUpdated(string data)
         {
-            _logger.LogTrace("SetOnListResourcesUpdated. Data: {0}", data);
+            _logger.LogTrace("LocalServer SetOnListResourcesUpdated. {0}. Data: {1}", _guid, data);
             _onListResourcesUpdated.OnNext(Unit.Default);
             return ResponseData<string>.Success(data, string.Empty).TaskFromResult();
-        }
-
-        public new void Dispose()
-        {
-            base.Dispose();
-            _onListToolUpdated.Dispose();
-            _onListResourcesUpdated.Dispose();
         }
     }
 }

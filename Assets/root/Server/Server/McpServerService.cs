@@ -42,6 +42,11 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (Instance != null)
                 throw new InvalidOperationException($"{typeof(McpServerService).Name} is already initialized.");
             Instance = this;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            _logger.LogTrace("StartAsync.");
 
             LocalServer.OnListToolUpdated
                 .Subscribe(OnListToolUpdated)
@@ -50,11 +55,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             // LocalServer.OnListResourcesUpdated
             //     .Subscribe(OnListResourcesUpdated)
             //     .AddTo(_disposables);
-        }
 
-        public Task StartAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogTrace("StartAsync.");
             return Task.CompletedTask;
         }
 
@@ -68,6 +69,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
 
         async void OnListToolUpdated(Unit _)
         {
+            _logger.LogTrace("OnListToolUpdated");
             try
             {
                 var tools = _mcpServer.ServerOptions.Capabilities?.Tools?.ToolCollection;

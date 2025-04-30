@@ -17,11 +17,12 @@ namespace com.IvanMurzak.Unity.MCP.Server
         protected readonly ILogger _logger;
         protected readonly IHubContext<T> _hubContext;
         protected readonly CompositeDisposable _disposables = new();
+        protected readonly string _guid = Guid.NewGuid().ToString();
 
         protected BaseHub(ILogger logger, IHubContext<T> hubContext)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logger.LogTrace("Ctor.");
+            _logger.LogTrace("{0} Ctor.", _guid);
             _hubContext = hubContext ?? throw new ArgumentNullException(nameof(hubContext));
         }
 
@@ -29,9 +30,9 @@ namespace com.IvanMurzak.Unity.MCP.Server
         {
             var clients = ConnectedClients.GetOrAdd(GetType(), _ => new());
             if (!clients.TryAdd(Context.ConnectionId, true))
-                _logger.LogWarning($"Client {Context.ConnectionId} is already connected to {GetType().Name}.");
+                _logger.LogWarning("{0} Client '{1}' is already connected to {2}.", _guid, Context.ConnectionId, GetType().Name);
 
-            _logger.LogInformation($"Client connected: '{Context.ConnectionId}', Total connected clients for {GetType().Name}: {clients.Count}");
+            _logger.LogInformation("{0} Client connected: '{1}', Total connected clients for {2}: {3}", _guid, Context.ConnectionId, GetType().Name, clients.Count);
             return base.OnConnectedAsync();
         }
 
@@ -39,16 +40,16 @@ namespace com.IvanMurzak.Unity.MCP.Server
         {
             if (!ConnectedClients.TryGetValue(GetType(), out var clients))
             {
-                _logger.LogWarning($"No connected clients found for {GetType().Name}.");
+                _logger.LogWarning("{0} No connected clients found for {1}.", _guid, GetType().Name);
                 return base.OnDisconnectedAsync(exception);
             }
             if (clients.TryRemove(Context.ConnectionId, out _))
             {
-                _logger.LogInformation($"Client disconnected: '{Context.ConnectionId}', Total connected clients for {GetType().Name}: {clients.Count}");
+                _logger.LogInformation("{0} Client disconnected: '{1}', Total connected clients for {2}: {3}", _guid, Context.ConnectionId, GetType().Name, clients.Count);
             }
             else
             {
-                _logger.LogWarning($"Client '{Context.ConnectionId}' was not found in connected clients for {GetType().Name}.");
+                _logger.LogWarning("{0} Client '{1}' was not found in connected clients for {2}: {3}", _guid, Context.ConnectionId, GetType().Name, clients.Count);
             }
 
             return base.OnDisconnectedAsync(exception);
@@ -102,6 +103,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
         }
         public new void Dispose()
         {
+            _logger.LogTrace("Dispose. {0}", _guid);
             base.Dispose();
             _disposables.Dispose();
 
