@@ -84,8 +84,14 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data.Utils
         {
             if (valueJsonElement == null)
                 return default;
-
-            return JsonUtils.Deserialize<T>(valueJsonElement.Value) ?? default;
+            try
+            {
+                return JsonUtils.Deserialize<T>(valueJsonElement.Value);
+            }
+            catch
+            {
+                return default;
+            }
         }
         public SerializedMember SetValue(object? value)
         {

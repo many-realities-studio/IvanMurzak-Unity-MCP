@@ -58,10 +58,10 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
             if (string.IsNullOrEmpty(fieldValue.name))
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.ComponentFieldNameIsEmpty());
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.ComponentFieldNameIsEmpty());
 
             if (string.IsNullOrEmpty(fieldValue.type))
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.ComponentFieldTypeIsEmpty());
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.ComponentFieldTypeIsEmpty());
 
             var fieldInfo = obj.GetType().GetField(fieldValue.name, flags);
             if (fieldInfo == null)
@@ -69,12 +69,12 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             var targetType = TypeUtils.GetType(fieldValue.type);
             if (targetType == null)
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.InvalidComponentFieldType(fieldValue, fieldInfo));
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.InvalidComponentFieldType(fieldValue, fieldInfo));
 
             try
             {
                 foreach (var populators in Registry.BuildPopulatorsChain(targetType))
-                    populators.SetAsField(ref obj, targetType, fieldInfo, value: fieldValue.valueJsonElement, flags: flags);
+                    populators.SetAsField(ref obj, targetType, fieldInfo, value: fieldValue, flags: flags);
 
                 return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Field '{fieldValue.name}' modified to '{fieldValue.valueJsonElement}'.");
             }
@@ -89,10 +89,10 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
             if (string.IsNullOrEmpty(propertyValue.name))
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.ComponentPropertyNameIsEmpty());
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.ComponentPropertyNameIsEmpty());
 
             if (string.IsNullOrEmpty(propertyValue.type))
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.ComponentPropertyTypeIsEmpty());
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.ComponentPropertyTypeIsEmpty());
 
             var propInfo = obj.GetType().GetProperty(propertyValue.name, flags);
             if (propInfo == null)
@@ -108,12 +108,12 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             var targetType = TypeUtils.GetType(propertyValue.type);
             if (targetType == null)
-                return stringBuilder?.AppendLine(new string(' ', depth) + Serializer.Error.InvalidComponentPropertyType(propertyValue, propInfo));
+                return stringBuilder?.AppendLine(new string(' ', depth) + Error.InvalidComponentPropertyType(propertyValue, propInfo));
 
             try
             {
                 foreach (var populators in Registry.BuildPopulatorsChain(targetType))
-                    populators.SetAsProperty(ref obj, targetType, propInfo, value: propertyValue.valueJsonElement, flags: flags);
+                    populators.SetAsProperty(ref obj, targetType, propInfo, value: propertyValue, flags: flags);
 
                 return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Property '{propertyValue.name}' modified to '{propertyValue.valueJsonElement}'.");
             }
@@ -124,16 +124,16 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             }
         }
 
-        public abstract bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+        public abstract bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public abstract bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+        public abstract bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public abstract bool SetField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+        public abstract bool SetField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public abstract bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+        public abstract bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
     }
 }

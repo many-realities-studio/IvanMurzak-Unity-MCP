@@ -53,15 +53,19 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             }
             return stringBuilder?.AppendLine($"[Error] InstanceID {instanceID} is not a Texture2D or Sprite.");
         }
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             var currentValue = fieldInfo.GetValue(obj);
-
-            return base.SetAsField(ref obj, type, fieldInfo, value, flags);
+            Populate(ref currentValue, value, 0, null, flags);
+            fieldInfo.SetValue(obj, currentValue);
+            return true;
         }
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            return base.SetAsProperty(ref obj, type, propertyInfo, value, flags);
+            var currentValue = propertyInfo.GetValue(obj);
+            Populate(ref currentValue, value, 0, null, flags);
+            propertyInfo.SetValue(obj, currentValue);
+            return true;
         }
     }
 }

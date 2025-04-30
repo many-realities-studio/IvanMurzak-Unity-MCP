@@ -2,7 +2,6 @@
 using System;
 using System.Reflection;
 using System.Text;
-using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
@@ -18,13 +17,13 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         StringBuilder? Populate(ref object obj, SerializedMember data, int depth = 0, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+        bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+        bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        bool SetField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+        bool SetField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
-        bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+        bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
     }
 }

@@ -40,20 +40,20 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             return true;
         }
 
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var instanceID = JsonUtils.Deserialize<InstanceID>(value.Value.GetRawText());
+            var instanceID = JsonUtils.Deserialize<InstanceID>(value.valueJsonElement?.GetRawText());
             var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
 
             fieldInfo.SetValue(obj, refObj);
             return true;
         }
 
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var instanceID = JsonUtils.Deserialize<InstanceID>(value.Value.GetRawText());
+            var instanceID = JsonUtils.Deserialize<InstanceID>(value.valueJsonElement?.GetRawText());
             var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
 
             propertyInfo.SetValue(obj, refObj);
