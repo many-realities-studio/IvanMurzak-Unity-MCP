@@ -7,11 +7,12 @@ using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
-    public partial class RS_UnityEngineObject : RS_Generic<UnityEngine.Object>
+    public class RS_UnityEngineObject : RS_UnityEngineObject<UnityEngine.Object> { }
+    public class RS_UnityEngineObject<T> : RS_Generic<T> where T : UnityEngine.Object
     {
         protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var unityObject = obj as UnityEngine.Object;
+            var unityObject = obj as T;
             if (type.IsClass)
             {
                 if (recursive)

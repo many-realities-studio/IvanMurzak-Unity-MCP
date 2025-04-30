@@ -34,7 +34,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
         [UnityTest]
         public IEnumerator ModifyComponent_Material()
         {
-            var material = new Material(Shader.Find("Standard"));
+            var sharedMaterial = new Material(Shader.Find("Standard"));
 
             var go = new GameObject(GO_ParentName);
             var component = go.AddComponent<MeshRenderer>();
@@ -45,13 +45,13 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                 )
                 .AddProperty(SerializedMember.FromValue(name: nameof(component.sharedMaterial),
                     type: typeof(Material),
-                    value: new InstanceID(material.GetInstanceID())));
+                    value: new InstanceID(sharedMaterial.GetInstanceID())));
 
             var result = new Tool_GameObject().ModifyComponent(data, instanceID: go.GetInstanceID());
             ResultValidation(result);
 
             Assert.IsTrue(result.Contains(GO_ParentName), $"{GO_ParentName} should be found in the path");
-            Assert.AreEqual(component.material.GetInstanceID(), material.GetInstanceID(), "Materials InstanceIDs should be the same.");
+            Assert.AreEqual(component.sharedMaterial.GetInstanceID(), sharedMaterial.GetInstanceID(), "Materials InstanceIDs should be the same.");
             yield return null;
         }
     }

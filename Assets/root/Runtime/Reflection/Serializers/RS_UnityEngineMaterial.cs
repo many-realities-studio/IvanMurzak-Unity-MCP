@@ -41,7 +41,9 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     UnityEngine.Rendering.ShaderPropertyType.Range => material.GetFloat(propName),
                     UnityEngine.Rendering.ShaderPropertyType.Color => material.GetColor(propName),
                     UnityEngine.Rendering.ShaderPropertyType.Vector => material.GetVector(propName),
-                    UnityEngine.Rendering.ShaderPropertyType.Texture => material.GetTexture(propName)?.GetInstanceID() ?? 0,
+                    UnityEngine.Rendering.ShaderPropertyType.Texture => material.GetTexture(propName)?.GetInstanceID() != null
+                        ? new InstanceID(material.GetTexture(propName).GetInstanceID())
+                        : null,
                     _ => default
                 };
                 if (propType == null)
@@ -124,7 +126,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 case Type t when t == typeof(Texture):
                     if (material.HasTexture(property.name))
                     {
-                        var instanceID = property.GetValue<int>();
+                        var instanceID = property.GetValue<InstanceID>()?.instanceID ?? property.GetValue<int>();
                         var texture = instanceID == 0
                             ? null
                             : UnityEditor.EditorUtility.InstanceIDToObject(instanceID) as Texture;

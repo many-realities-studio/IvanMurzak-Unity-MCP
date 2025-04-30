@@ -1,21 +1,16 @@
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Reflection;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
-using com.IvanMurzak.Unity.MCP.Common.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
-    public abstract partial class ReflectionSerializerBase<T> : IReflectionSerializer
+    public abstract partial class RS_Base<T> : IReflectionSerializer
     {
-        public virtual int SerializationPriority(Type type)
-        {
-            if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
-                return 0;
-            var distance = TypeUtils.GetInheritanceDistance(baseType: typeof(T), targetType: type);
-            return distance == -1 ? 0 : MAX_DEPTH - distance;
-        }
+        protected virtual IEnumerable<string> ignoredFields => Enumerable.Empty<string>();
+        protected virtual IEnumerable<string> ignoredProperties => Enumerable.Empty<string>();
 
         public virtual SerializedMember Serialize(object obj, Type? type = null, string? name = null, bool recursive = true,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
@@ -35,6 +30,9 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             foreach (var field in GetSerializableFields(objType, flags))
             {
+                if (ignoredFields.Contains(field.Name))
+                    continue;
+
                 var value = field.GetValue(obj);
                 var fieldType = field.FieldType;
 
@@ -52,6 +50,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
             foreach (var prop in GetSerializableProperties(objType, flags))
             {
+                if (ignoredProperties.Contains(prop.Name))
+                    continue;
                 try
                 {
                     var value = prop.GetValue(obj);

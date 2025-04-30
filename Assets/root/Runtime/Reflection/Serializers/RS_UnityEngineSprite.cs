@@ -1,0 +1,67 @@
+#pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
+
+using System;
+using System.Linq;
+using System.Reflection;
+using System.Text;
+using System.Text.Json;
+using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
+using UnityEditor;
+
+namespace com.IvanMurzak.Unity.MCP.Utils
+{
+    public partial class RS_UnityEngineSprite : RS_UnityEngineObject<UnityEngine.Sprite>
+    {
+        protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            if (obj is UnityEngine.Texture2D texture)
+            {
+                var instanceID = new InstanceID(texture.GetInstanceID());
+                return SerializedMember.FromValue(type, instanceID, name);
+            }
+
+            return base.InternalSerialize(obj, type, name, recursive, flags);
+        }
+        public override StringBuilder Populate(ref object obj, SerializedMember data, int depth = 0, StringBuilder stringBuilder = null, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            var instanceID = data.GetInstanceID();
+            if (instanceID == 0)
+            {
+                obj = null;
+                return stringBuilder?.AppendLine($"[Success] InstanceID is 0. Cleared the reference.");
+            }
+            var textureOrSprite = EditorUtility.InstanceIDToObject(instanceID);
+            if (textureOrSprite == null)
+                return stringBuilder?.AppendLine($"[Error] InstanceID {instanceID} not found.");
+
+            if (textureOrSprite is UnityEngine.Texture2D texture)
+            {
+                var path = AssetDatabase.GetAssetPath(texture);
+                var sprites = AssetDatabase.LoadAllAssetRepresentationsAtPath(path)
+                    .OfType<UnityEngine.Sprite>()
+                    .ToArray();
+                if (sprites.Length == 0)
+                    return stringBuilder?.AppendLine($"[Error] No sprites found for texture at path: {path}.");
+
+                obj = sprites[0]; // Assign the first sprite found
+                return stringBuilder?.AppendLine($"[Success] Assigned sprite from texture: {path}.");
+            }
+            if (textureOrSprite is UnityEngine.Sprite sprite)
+            {
+                obj = sprite;
+                return stringBuilder?.AppendLine($"[Success] Assigned sprite: {sprite.name}.");
+            }
+            return stringBuilder?.AppendLine($"[Error] InstanceID {instanceID} is not a Texture2D or Sprite.");
+        }
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            var currentValue = fieldInfo.GetValue(obj);
+
+            return base.SetAsField(ref obj, type, fieldInfo, value, flags);
+        }
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
+        {
+            return base.SetAsProperty(ref obj, type, propertyInfo, value, flags);
+        }
+    }
+}

@@ -6,30 +6,29 @@ using System.Reflection;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
-using com.IvanMurzak.Unity.MCP.Common.Utils;
 using UnityEngine;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
-    public partial class RS_Array : ReflectionSerializerBase<Array>
+    public partial class RS_Generic<T> : RS_NotArray<T>
     {
-        public override int PopulatePriority(Type type)
-            => typeof(System.Collections.IEnumerable).IsAssignableFrom(type) && type != typeof(string) ? MAX_DEPTH / 2 : 0;
-        public override int SerializationPriority(Type type)
-            => typeof(System.Collections.IEnumerable).IsAssignableFrom(type) && type != typeof(string) ? MAX_DEPTH / 2 : 0;
-
         protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            int index = 0;
-            var serializedList = new List<SerializedMember>();
-            var enumerable = (System.Collections.IEnumerable)obj;
-
-            foreach (var element in enumerable)
-                serializedList.Add(Serializer.Serialize(element, type: element?.GetType(), name: $"[{index++}]", recursive: recursive, flags: flags));
-
-            return SerializedMember.FromValue(type, serializedList, name: name);
+            var isStruct = type.IsValueType && !type.IsPrimitive && !type.IsEnum;
+            if (type.IsClass || isStruct)
+            {
+                return recursive
+                    ? new SerializedMember()
+                    {
+                        name = name,
+                        type = type.FullName,
+                        fields = SerializeFields(obj, flags),
+                        properties = SerializeProperties(obj, flags)
+                    }
+                    : SerializedMember.FromJson(type, JsonUtils.Serialize(obj), name: name);
+            }
+            throw new ArgumentException($"Unsupported type: {type.FullName}");
         }
-
         protected override IEnumerable<FieldInfo> GetSerializableFields(Type objType, BindingFlags flags)
             => objType.GetFields(flags)
                 .Where(field => field.GetCustomAttribute<ObsoleteAttribute>() == null)
@@ -42,54 +41,24 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
         protected override bool SetValue(ref object obj, Type type, JsonElement? value)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.Value.GetRawText());
-            var enumerable = parsedList
-                .Select(element =>
-                {
-                    var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
-                    return elementValue;
-                });
-
-            obj = type.IsArray
-                ? enumerable.ToArray()
-                : enumerable.ToList();
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            obj = parsedValue;
             return true;
         }
 
         public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, JsonElement? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.Value.GetRawText());
-            var enumerable = parsedList
-                .Select(element =>
-                {
-                    var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
-                    return elementValue;
-                });
-
-            fieldInfo.SetValue(obj, type.IsArray
-                ? enumerable.ToArray()
-                : enumerable.ToList());
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            fieldInfo.SetValue(obj, parsedValue);
             return true;
         }
 
         public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, JsonElement? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.Value.GetRawText());
-            var enumerable = parsedList
-                .Select(element =>
-                {
-                    var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
-                    return elementValue;
-                });
-
-            propertyInfo.SetValue(obj, type.IsArray
-                ? enumerable.ToArray()
-                : enumerable.ToList());
+            var parsedValue = JsonUtils.Deserialize(value.Value.GetRawText(), type);
+            propertyInfo.SetValue(obj, parsedValue);
             return true;
         }
 

@@ -9,15 +9,8 @@ using static com.IvanMurzak.Unity.MCP.Utils.Serializer;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
-    public abstract partial class ReflectionSerializerBase<T> : IReflectionSerializer
+    public abstract partial class RS_Base<T> : IReflectionSerializer
     {
-        public virtual int PopulatePriority(Type type)
-        {
-            if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
-                return 0;
-            var distance = TypeUtils.GetInheritanceDistance(baseType: typeof(T), targetType: type);
-            return distance == -1 ? 0 : MAX_DEPTH - distance;
-        }
         public virtual StringBuilder? Populate(ref object obj, SerializedMember data, int depth = 0, StringBuilder? stringBuilder = null, BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance)
         {
             if (string.IsNullOrEmpty(data.type))

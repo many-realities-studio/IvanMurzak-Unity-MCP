@@ -13,7 +13,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
         bool AllowCascadePopulate { get; }
 
         int SerializationPriority(Type type);
-        int PopulatePriority(Type type);
+
         SerializedMember Serialize(object obj, Type? type = null, string? name = null, bool recursive = true,
             BindingFlags flags = BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
         StringBuilder? Populate(ref object obj, SerializedMember data, int depth = 0, StringBuilder? stringBuilder = null,
