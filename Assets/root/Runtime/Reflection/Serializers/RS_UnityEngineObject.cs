@@ -8,7 +8,7 @@ using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 namespace com.IvanMurzak.Unity.MCP.Utils
 {
     public class RS_UnityEngineObject : RS_UnityEngineObject<UnityEngine.Object> { }
-    public class RS_UnityEngineObject<T> : RS_Generic<T> where T : UnityEngine.Object
+    public partial class RS_UnityEngineObject<T> : RS_Generic<T> where T : UnityEngine.Object
     {
         protected override SerializedMember InternalSerialize(object obj, Type type, string name = null, bool recursive = true, BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
@@ -37,26 +37,6 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
         protected override bool SetValue(ref object obj, Type type, JsonElement? value)
         {
-            return true;
-        }
-
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
-            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-        {
-            var instanceID = JsonUtils.Deserialize<InstanceID>(value.valueJsonElement?.GetRawText());
-            var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
-
-            fieldInfo.SetValue(obj, refObj);
-            return true;
-        }
-
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
-            BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
-        {
-            var instanceID = JsonUtils.Deserialize<InstanceID>(value.valueJsonElement?.GetRawText());
-            var refObj = UnityEditor.EditorUtility.InstanceIDToObject(instanceID.instanceID);
-
-            propertyInfo.SetValue(obj, refObj);
             return true;
         }
     }
