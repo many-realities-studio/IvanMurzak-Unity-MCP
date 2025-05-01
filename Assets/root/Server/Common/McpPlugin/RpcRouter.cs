@@ -93,13 +93,13 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public Task<ResponseData<string>> NotifyAboutUpdatedTools(CancellationToken cancellationToken = default)
         {
             _logger.LogTrace("Notify server about updated tools.");
-            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.SetOnListToolsUpdated, string.Empty, cancellationToken);
+            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.OnListToolsUpdated, string.Empty, cancellationToken);
         }
 
         public Task<ResponseData<string>> NotifyAboutUpdatedResources(CancellationToken cancellationToken = default)
         {
             _logger.LogTrace("Notify server about updated resources.");
-            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.SetOnListResourcesUpdated, string.Empty, cancellationToken);
+            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.OnListResourcesUpdated, string.Empty, cancellationToken);
         }
 
         public void Dispose()

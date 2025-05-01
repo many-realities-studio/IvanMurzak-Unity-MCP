@@ -12,12 +12,10 @@ namespace com.IvanMurzak.Unity.MCP.Common
             public const int DefaultPort = 60606;
             public const int MaxPort = 65535;
             public const string DefaultEndpoint = "http://localhost:60606";
-            public const string LocalServer = "/mcp/local-server";
             public const string RemoteApp = "/mcp/remote-app";
             public const float TimeoutSeconds = 10f;
-            public const string Ping = "Ping";
-            public const string Pong = "Pong";
         }
+
         public static partial class RPC
         {
             public static class Client
@@ -31,8 +29,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
             public static class Server
             {
-                public const string SetOnListToolsUpdated = "SetOnListToolsUpdated";
-                public const string SetOnListResourcesUpdated = "SetOnListResourcesUpdated";
+                public const string OnListToolsUpdated = "OnListToolsUpdated";
+                public const string OnListResourcesUpdated = "OnListResourcesUpdated";
             }
         }
     }

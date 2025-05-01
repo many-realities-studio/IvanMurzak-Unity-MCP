@@ -6,8 +6,8 @@ namespace com.IvanMurzak.Unity.MCP.Server
 {
     public interface IRemoteApp : IToolResponseReceiver, IResourceResponseReceiver, IDisposable
     {
-        Task<IResponseData<string>> SetOnListToolsUpdated(string data);
-        Task<IResponseData<string>> SetOnListResourcesUpdated(string data);
+        Task<IResponseData<string>> OnListToolsUpdated(string data);
+        Task<IResponseData<string>> OnListResourcesUpdated(string data);
     }
 
     public interface IToolResponseReceiver
