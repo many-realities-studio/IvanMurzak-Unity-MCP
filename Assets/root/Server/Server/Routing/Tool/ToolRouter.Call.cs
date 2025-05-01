@@ -32,8 +32,8 @@ namespace com.IvanMurzak.Unity.MCP.Server
                 return new CallToolResponse().SetError("[Error] 'McpServerService' is null");
 
             var toolRunner = mcpServerService.McpRunner.HasTool(request.Params.Name)
-                ? mcpServerService.McpRunner as IToolRunner
-                : mcpServerService.RemoteApp;
+                ? mcpServerService.McpRunner
+                : mcpServerService.ToolRunner;
 
             if (toolRunner == null)
                 return new CallToolResponse().SetError("[Error] 'ToolRunner' is null");
@@ -42,7 +42,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (logger.IsTraceEnabled)
                 logger.Trace("Call remote tool '{0}':\n{1}", request.Params.Name, JsonUtils.Serialize(requestData));
 
-            var response = await toolRunner.RunCallTool(requestData, cancellationToken);
+            var response = await toolRunner.RunCallTool(requestData, cancellationToken: cancellationToken);
             if (response == null)
                 return new CallToolResponse().SetError("[Error] Resource is null");
 

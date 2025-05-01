@@ -46,18 +46,6 @@ namespace com.IvanMurzak.Unity.MCP.Server
             InputSchema = response.InputSchema
         };
 
-        public static McpServerTool ToMcpServerTool(this IResponseListTool response) => McpServerTool.Create
-        (
-            method: null, // MCP csharp-sdk doesn't have API to provide Json Schema
-            options: new McpServerToolCreateOptions()
-            {
-                Name = response.Name,
-                Title = response.Title,
-                Description = response.Description,
-            },
-            target: null
-        );
-
         public static CallToolResponse ToCallToolRespose(this IResponseCallTool response) => new CallToolResponse()
         {
             IsError = response.IsError,

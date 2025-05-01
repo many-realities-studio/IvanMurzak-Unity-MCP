@@ -99,16 +99,45 @@ namespace com.IvanMurzak.Unity.MCP.Common
             if (_hubConnection.Value != null)
                 await _hubConnection.Value.StopAsync();
 
-            // await Task.Delay(100, cancellationToken);
+            _continueToReconnect.Value = true;
 
-            // Create a new internal CancellationTokenSource and link it to the external token
+            if (_hubConnection.Value?.State == HubConnectionState.Connected)
+                return true;
+
             internalCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
-            using (var timeoutCts = new CancellationTokenSource(TimeSpan.FromSeconds(10)))
-            {
-                using var linkedCts = CancellationTokenSource.CreateLinkedTokenSource(internalCts.Token, timeoutCts.Token);
 
-                _continueToReconnect.Value = true;
-                return await InternalConnect(linkedCts.Token);
+            if (connectionTask != null)
+            {
+                _logger.LogDebug("Connection task already exists. Waiting for the completion... {0}.", Endpoint);
+                // Create a new task that waits for the existing task but can be canceled independently
+                return await Task.Run(async () =>
+                {
+                    try
+                    {
+                        await connectionTask; // Wait for the existing connection task
+                        return _hubConnection.Value?.State == HubConnectionState.Connected;
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        _logger.LogWarning("Connection task was canceled {0}.", Endpoint);
+                        return false;
+                    }
+                }, internalCts.Token);
+            }
+
+            try
+            {
+                connectionTask = InternalConnect(internalCts.Token);
+                return await connectionTask;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError("Error during connection: {0}\n{1}", ex.Message, ex.StackTrace);
+                return false;
+            }
+            finally
+            {
+                connectionTask = null;
             }
         }
 
@@ -159,66 +188,43 @@ namespace com.IvanMurzak.Unity.MCP.Common
                     .RegisterTo(cancellationToken);
             }
 
-            if (_hubConnection.Value?.State == HubConnectionState.Connected)
-                return true;
-
-            if (connectionTask != null)
-            {
-                _logger.LogDebug("Connection task already exists. Waiting for the completion... {0}.", Endpoint);
-                // Create a new task that waits for the existing task but can be canceled independently
-                return await Task.Run(async () =>
-                {
-                    try
-                    {
-                        await connectionTask; // Wait for the existing connection task
-                        return _hubConnection.Value?.State == HubConnectionState.Connected;
-                    }
-                    catch (OperationCanceledException)
-                    {
-                        _logger.LogWarning("Connection task was canceled {0}.", Endpoint);
-                        return false;
-                    }
-                }, cancellationToken);
-            }
-
             _logger.LogDebug("Connecting to {0}...", Endpoint);
-            connectionTask = _hubConnection.CurrentValue.StartAsync(cancellationToken)
-                .ContinueWith(async task =>
+            while (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
+            {
+                var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
+                var task = _hubConnection.CurrentValue.StartAsync(cts.Token);
+                try
                 {
-                    connectionTask = null;
-                    if (task.IsCompletedSuccessfully)
+                    await Task.WhenAny(task, Task.Delay(TimeSpan.FromSeconds(3), cancellationToken));
+                    if (!task.IsCompletedSuccessfully)
                     {
-                        _logger.LogInformation("Connection started successfully {0}.", Endpoint);
-                        _connectionState.Value = HubConnectionState.Connected;
-                        return true;
+                        if (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
+                        {
+                            _logger.LogTrace("Waiting before retry... {0}", Endpoint);
+                            await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken); // Wait before retrying
+                        }
+                        continue;
                     }
-
-                    if (task.Exception != null)
-                    {
-                        foreach (var innerException in task.Exception.InnerExceptions)
-                            _logger.LogWarning("Failed to start connection. {0} - {1}\n{2}", Endpoint, innerException.Message, innerException.StackTrace);
-                    }
-                    else
-                    {
-                        _logger.LogWarning("Failed to start connection: Unknown error {0}.", Endpoint);
-                    }
-
-                    if (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
-                    {
-                        _logger.LogTrace("Waiting before retry... {0}", Endpoint);
-                        await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken); // Wait before retrying
-
-                        // Cancel the current connection task to allow for a new connection attempt
-                        // connectionTask?.Dispose();
-                        // connectionTask = null;
-
-                        _logger.LogTrace("Retrying connection... {0}", Endpoint);
-                        return await InternalConnect(cancellationToken);
-                    }
-                    _connectionState.Value = HubConnectionState.Disconnected;
-                    return false;
-                }).Unwrap();
-            return await connectionTask;
+                    _logger.LogInformation("Connection started successfully {0}.", Endpoint);
+                    _connectionState.Value = HubConnectionState.Connected;
+                    return true;
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogWarning("Failed to start connection. {0} - {1}\n{2}", Endpoint, ex.Message, ex.StackTrace);
+                }
+                finally
+                {
+                    cts.Cancel();
+                    cts.Dispose();
+                }
+                if (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
+                {
+                    _logger.LogTrace("Waiting before retry... {0}", Endpoint);
+                    await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken); // Wait before retrying
+                }
+            }
+            return false;
         }
 
         public Task Disconnect(CancellationToken cancellationToken = default)

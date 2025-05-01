@@ -9,7 +9,13 @@ namespace com.IvanMurzak.Unity.MCP.Server
         {
             builder.Services.AddRouting();
             builder.Services.AddHostedService<McpServerService>();
+
+            builder.Services.AddSingleton<EventAppToolsChange>();
+            builder.Services.AddSingleton<IToolRunner, RemoteToolRunner>();
+            builder.Services.AddSingleton<IResourceRunner, RemoteResourceRunner>();
+
             builder.AddMcpRunner();
+
             return builder;
         }
     }

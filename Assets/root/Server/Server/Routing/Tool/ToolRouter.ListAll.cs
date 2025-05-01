@@ -20,13 +20,13 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (mcpServerService == null)
                 return new ListToolsResult().SetError("[Error] 'McpServerService' is null");
 
-            var remoteApp = mcpServerService.RemoteApp;
-            if (remoteApp == null)
+            var toolRunner = mcpServerService.ToolRunner;
+            if (toolRunner == null)
                 return new ListToolsResult().SetError("[Error] 'RemoteApp' is null");
 
             var requestData = new RequestListTool();
 
-            var response = await remoteApp.RunListTool(requestData, cancellationToken: cancellationToken);
+            var response = await toolRunner.RunListTool(requestData, cancellationToken: cancellationToken);
             if (response == null)
                 return new ListToolsResult().SetError("[Error] Resource is null");
 

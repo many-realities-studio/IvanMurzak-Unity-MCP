@@ -44,7 +44,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
             RemoteServer?.Connect(cancellationToken);
             return _rpcRouter.Connect(cancellationToken).ContinueWith(task =>
             {
-                if (task.IsCompletedSuccessfully)
+                if (task.IsCompletedSuccessfully && task.Result)
                     RemoteServer?.NotifyAboutUpdatedTools();
                 return task.IsCompletedSuccessfully;
             });

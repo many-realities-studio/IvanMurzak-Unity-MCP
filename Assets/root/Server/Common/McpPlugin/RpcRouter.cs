@@ -9,14 +9,13 @@ using R3;
 
 namespace com.IvanMurzak.Unity.MCP.Common
 {
-    public class RpcRouter : IRpcRouter
+    public class RpcRouter : IRpcRouter, IRemoteServer
     {
         readonly ILogger<RpcRouter> _logger;
         readonly IMcpRunner _mcpRunner;
         readonly IConnectionManager _connectionManager;
         readonly CompositeDisposable _serverEventsDisposables = new();
         readonly IDisposable _hubConnectionDisposable;
-        readonly string guid = System.Guid.NewGuid().ToString();
 
         public ReadOnlyReactiveProperty<HubConnectionState> ConnectionState => _connectionManager.ConnectionState;
         public ReadOnlyReactiveProperty<bool> KeepConnected => _connectionManager.KeepConnected;
@@ -55,22 +54,6 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
             _logger.LogTrace("Subscribing to server events.");
 
-            // hubConnection.On<string, string>(Consts.Hub.Ping,
-            //     ping => ping == Consts.Hub.Ping
-            //         ? Consts.Hub.Pong
-            //         : ping)
-            //     .AddTo(_serverEventsDisposables);
-
-            hubConnection.On<string, string>(Consts.Hub.Ping,
-                ping =>
-                {
-                    _logger.LogTrace("ping " + guid);
-                    return ping == Consts.Hub.Ping
-                        ? Consts.Hub.Pong
-                        : ping;
-                })
-                .AddTo(_serverEventsDisposables);
-
             hubConnection.On<RequestCallTool, IResponseData<ResponseCallTool>>(Consts.RPC.Client.RunCallTool, async data =>
                 {
                     _logger.LogDebug("Call Tool called.");
@@ -105,6 +88,18 @@ namespace com.IvanMurzak.Unity.MCP.Common
                     return await _mcpRunner.RunResourceTemplates(data);
                 })
                 .AddTo(_serverEventsDisposables);
+        }
+
+        public Task<ResponseData<string>> NotifyAboutUpdatedTools(CancellationToken cancellationToken = default)
+        {
+            _logger.LogTrace("Notify server about updated tools.");
+            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.SetOnListToolsUpdated, string.Empty, cancellationToken);
+        }
+
+        public Task<ResponseData<string>> NotifyAboutUpdatedResources(CancellationToken cancellationToken = default)
+        {
+            _logger.LogTrace("Notify server about updated resources.");
+            return _connectionManager.InvokeAsync<string, ResponseData<string>>(Consts.RPC.Server.SetOnListResourcesUpdated, string.Empty, cancellationToken);
         }
 
         public void Dispose()
