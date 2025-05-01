@@ -17,6 +17,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
         readonly Func<string, Task<HubConnection>> _hubConnectionBuilder;
         readonly ReactiveProperty<HubConnectionState> _connectionState = new(HubConnectionState.Disconnected);
         readonly ReactiveProperty<bool> _continueToReconnect = new(false);
+        readonly CompositeDisposable _disposables = new();
 
         Task<bool>? connectionTask;
         HubConnectionLogger? hubConnectionLogger;
@@ -42,8 +43,15 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 }
 
                 hubConnection.ToObservable().State
-                    .Subscribe(state => _connectionState.Value = state);
-            });
+                    .Subscribe(state => _connectionState.Value = state)
+                    .AddTo(_disposables);
+            })
+            .AddTo(_disposables);
+
+            _connectionState
+                .Where(state => state == HubConnectionState.Reconnecting)
+                .Subscribe(async state => await Connect())
+                .AddTo(_disposables);
         }
 
         public async Task InvokeAsync<TInput>(string methodName, TInput input, CancellationToken cancellationToken = default)
@@ -264,6 +272,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public async Task DisposeAsync()
         {
             connectionTask = null;
+            _disposables.Dispose();
+
             if (!_continueToReconnect.IsDisposed)
                 _continueToReconnect.Value = false;
 
