@@ -13,9 +13,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_ModifyComponent",
-            Title = "Modify Component at GameObject in opened Prefab or in a Scene",
-            Description = "Modify existed component at GameObject."
+            Title = "Modify Component at GameObject in opened Prefab or in a Scene"
         )]
+        [Description("Modify existed component at GameObject.")]
         public string ModifyComponent
         (
             [Description(@"Json Object with required readonly 'instanceID' and 'type' fields.

@@ -11,10 +11,10 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_GetComponents",
-            Title = "Get GameObject components in opened Prefab or in a Scene",
-            Description = @"Get components of the target GameObject. Returns property values of each component.
-Returns list of all available components preview if no requested components found."
+            Title = "Get GameObject components in opened Prefab or in a Scene"
         )]
+        [Description(@"Get components of the target GameObject. Returns property values of each component.
+Returns list of all available components preview if no requested components found.")]
         public string GetComponents
         (
             [Description("The 'instanceID' array of the target components. Leave it empty if all components needed.")]

@@ -11,9 +11,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_AddComponent",
-            Title = "Add Component to a GameObject in opened Prefab or in a Scene",
-            Description = "Add a component to a GameObject."
+            Title = "Add Component to a GameObject in opened Prefab or in a Scene"
         )]
+        [Description("Add a component to a GameObject.")]
         public string AddComponent
         (
             [Description("Full name of the Component. It should include full namespace path and the class name.")]

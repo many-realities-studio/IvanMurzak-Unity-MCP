@@ -12,9 +12,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_SetParent",
-            Title = "Set parent GameObject in opened Prefab or in a Scene",
-            Description = @"Set GameObjects in opened Prefab or in a Scene by 'instanceID' (int) array."
+            Title = "Set parent GameObject in opened Prefab or in a Scene"
         )]
+        [Description(@"Set GameObjects in opened Prefab or in a Scene by 'instanceID' (int) array.")]
         public string SetParent
         (
             [Description("The 'instanceID' array of the target GameObjects.")]

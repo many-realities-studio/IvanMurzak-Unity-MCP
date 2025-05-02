@@ -13,9 +13,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_Duplicate",
-            Title = "Duplicate GameObjects in opened Prefab and in a Scene",
-            Description = @"Duplicate GameObjects in opened Prefab and in a Scene by 'instanceID' (int) array."
+            Title = "Duplicate GameObjects in opened Prefab and in a Scene"
         )]
+        [Description(@"Duplicate GameObjects in opened Prefab and in a Scene by 'instanceID' (int) array.")]
         public string Duplicate
         (
             [Description("The 'instanceID' array of the target GameObjects.")]

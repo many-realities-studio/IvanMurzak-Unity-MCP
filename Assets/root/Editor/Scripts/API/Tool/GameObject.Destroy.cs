@@ -1,7 +1,6 @@
 #pragma warning disable CS8632 // The annotation for nullable reference types should only be used in code within a '#nullable' annotations context.
 using System.ComponentModel;
 using com.IvanMurzak.Unity.MCP.Common;
-using com.IvanMurzak.Unity.MCP.Editor.Utils;
 using com.IvanMurzak.Unity.MCP.Utils;
 using UnityEngine;
 
@@ -12,10 +11,10 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_Destroy",
-            Title = "Destroy GameObject in opened Prefab or in a Scene",
-            Description = @"Destroy a GameObject and all nested GameObjects recursively.
-Use 'instanceID' whenever possible, because it finds the exact GameObject, when 'path' may find a wrong one."
+            Title = "Destroy GameObject in opened Prefab or in a Scene"
         )]
+        [Description(@"Destroy a GameObject and all nested GameObjects recursively.
+Use 'instanceID' whenever possible, because it finds the exact GameObject, when 'path' may find a wrong one.")]
         public string Destroy
         (
             [Description("Delete by 'instanceID' (int). Priority: 1. (Recommended)")]
