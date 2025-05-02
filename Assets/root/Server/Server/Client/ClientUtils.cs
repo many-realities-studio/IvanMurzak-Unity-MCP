@@ -24,7 +24,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             where THub : Hub
         {
             if (string.IsNullOrEmpty(connectionId))
-                return ResponseData<TResponse>.Error(requestData.RequestID, $"Connection ID is null. Can't Invoke method '{methodName}'.")
+                return ResponseData<TResponse>.Error(requestData.RequestID, $"'{nameof(connectionId)}' is null. Can't Invoke method '{methodName}'.")
                     .Log(logger);
 
             if (hubContext == null)

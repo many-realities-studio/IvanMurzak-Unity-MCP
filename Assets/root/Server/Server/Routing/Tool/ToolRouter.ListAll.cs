@@ -14,21 +14,21 @@ namespace com.IvanMurzak.Unity.MCP.Server
         public static async Task<ListToolsResult> ListAll(RequestContext<ListToolsRequestParams> request, CancellationToken cancellationToken)
         {
             var logger = LogManager.GetCurrentClassLogger();
-            logger.Trace("ListAll called");
+            logger.Trace("{0}.ListAll", typeof(ToolRouter).Name);
 
             var mcpServerService = McpServerService.Instance;
             if (mcpServerService == null)
-                return new ListToolsResult().SetError("[Error] 'McpServerService' is null");
+                return new ListToolsResult().SetError($"[Error] '{nameof(mcpServerService)}' is null");
 
             var toolRunner = mcpServerService.ToolRunner;
             if (toolRunner == null)
-                return new ListToolsResult().SetError("[Error] 'RemoteApp' is null");
+                return new ListToolsResult().SetError($"[Error] '{nameof(toolRunner)}' is null");
 
             var requestData = new RequestListTool();
 
             var response = await toolRunner.RunListTool(requestData, cancellationToken: cancellationToken);
             if (response == null)
-                return new ListToolsResult().SetError("[Error] Resource is null");
+                return new ListToolsResult().SetError($"[Error] '{nameof(response)}' is null");
 
             if (response.IsError)
                 return new ListToolsResult().SetError(response.Message ?? "[Error] Got an error during reading resources");

@@ -46,7 +46,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             InputSchema = response.InputSchema
         };
 
-        public static CallToolResponse ToCallToolRespose(this IResponseCallTool response) => new CallToolResponse()
+        public static CallToolResponse ToCallToolResponse(this IResponseCallTool response) => new CallToolResponse()
         {
             IsError = response.IsError,
             Content = response.Content

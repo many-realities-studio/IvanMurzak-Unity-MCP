@@ -16,7 +16,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
         public static async Task<CallToolResponse> Call(RequestContext<CallToolRequestParams> request, CancellationToken cancellationToken)
         {
             var logger = LogManager.GetCurrentClassLogger();
-            logger.Trace("Call called");
+            logger.Trace("{0}.Call", typeof(ToolRouter).Name);
 
             if (request == null)
                 return new CallToolResponse().SetError("[Error] Request is null");
@@ -29,14 +29,14 @@ namespace com.IvanMurzak.Unity.MCP.Server
 
             var mcpServerService = McpServerService.Instance;
             if (mcpServerService == null)
-                return new CallToolResponse().SetError("[Error] 'McpServerService' is null");
+                return new CallToolResponse().SetError($"[Error] '{nameof(mcpServerService)}' is null");
 
             var toolRunner = mcpServerService.McpRunner.HasTool(request.Params.Name)
                 ? mcpServerService.McpRunner
                 : mcpServerService.ToolRunner;
 
             if (toolRunner == null)
-                return new CallToolResponse().SetError("[Error] 'ToolRunner' is null");
+                return new CallToolResponse().SetError($"[Error] '{nameof(toolRunner)}' is null");
 
             var requestData = new RequestCallTool(request.Params.Name, request.Params.Arguments);
             if (logger.IsTraceEnabled)
@@ -44,7 +44,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
 
             var response = await toolRunner.RunCallTool(requestData, cancellationToken: cancellationToken);
             if (response == null)
-                return new CallToolResponse().SetError("[Error] Resource is null");
+                return new CallToolResponse().SetError($"[Error] '{nameof(response)}' is null");
 
             if (logger.IsTraceEnabled)
                 logger.Trace("Call tool response:\n{0}", JsonUtils.Serialize(response));
@@ -55,7 +55,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (response.Value == null)
                 return new CallToolResponse().SetError("[Error] Tool returned null value");
 
-            return response.Value.ToCallToolRespose();
+            return response.Value.ToCallToolResponse();
         }
 
         public static Task<CallToolResponse> Call(string name, Action<Dictionary<string, object>>? configureArguments = null)
