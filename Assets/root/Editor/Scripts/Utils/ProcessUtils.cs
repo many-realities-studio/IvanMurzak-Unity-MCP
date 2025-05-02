@@ -23,21 +23,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Utils
             processStartInfo.CreateNoWindow = true;
 
 #if !UNITY_EDITOR_WIN
-            // Explicitly set the PATH environment variable
-            if (!processStartInfo.EnvironmentVariables.ContainsKey("PATH"))
-            {
-                var systemPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
-
-                // Add the path to the dotnet executable if needed
-                var dotnetPath = "/usr/local/share/dotnet:/usr/bin:/bin:/usr/sbin:/sbin";
-                processStartInfo.EnvironmentVariables["PATH"] = $"{systemPath}:{dotnetPath}";
-            }
-
-            // Ensure the full path to the dotnet executable is used
-            if (processStartInfo.FileName == "dotnet")
-            {
-                processStartInfo.FileName = "/usr/local/share/dotnet/dotnet"; // Adjust this path if dotnet is installed elsewhere
-            }
+            FixEnvironmentPath(processStartInfo);
 #endif
 
             await Task.Run(() =>
@@ -65,6 +51,22 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Utils
                 }
             });
             return (output, error);
+        }
+        static void FixEnvironmentPath(ProcessStartInfo processStartInfo)
+        {
+            // Explicitly set the PATH environment variable
+            if (!processStartInfo.EnvironmentVariables.ContainsKey("PATH"))
+            {
+                var systemPath = Environment.GetEnvironmentVariable("PATH") ?? string.Empty;
+
+                // Add the path to the dotnet executable if needed
+                var dotnetPath = "/usr/local/share/dotnet:/usr/bin:/bin:/usr/sbin:/sbin";
+                processStartInfo.EnvironmentVariables["PATH"] = $"{systemPath}:{dotnetPath}";
+            }
+
+            // Ensure the full path to the dotnet executable is used
+            if (processStartInfo.FileName == "dotnet")
+                processStartInfo.FileName = "/usr/local/share/dotnet/dotnet"; // Adjust this path if dotnet is installed elsewhere
         }
     }
 }
