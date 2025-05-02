@@ -14,9 +14,10 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
         readonly ILogger<McpPlugin> _logger;
         readonly IRpcRouter _rpcRouter;
+        readonly IRemoteServer _remoteServer;
+        readonly CompositeDisposable _disposables = new();
 
         public IMcpRunner McpRunner { get; private set; }
-        public IRemoteServer RemoteServer { get; private set; }
         public ReadOnlyReactiveProperty<HubConnectionState> ConnectionState => _rpcRouter.ConnectionState;
         public ReadOnlyReactiveProperty<bool> KeepConnected => _rpcRouter.KeepConnected;
 
@@ -26,9 +27,16 @@ namespace com.IvanMurzak.Unity.MCP.Common
             _logger.LogTrace("{0} Ctor. Version: {Version}", typeof(McpPlugin).Name, Version);
 
             _rpcRouter = rpcRouter ?? throw new ArgumentNullException(nameof(rpcRouter));
+            _remoteServer = remoteServer ?? throw new ArgumentNullException(nameof(remoteServer));
 
             McpRunner = mcpRunner ?? throw new ArgumentNullException(nameof(mcpRunner));
-            RemoteServer = remoteServer ?? throw new ArgumentNullException(nameof(remoteServer));
+
+            _rpcRouter.ConnectionState
+                .Where(state => state == HubConnectionState.Connected)
+                .Subscribe(state =>
+                {
+                    _remoteServer.NotifyAboutUpdatedTools(_disposables.ToCancellationToken());
+                }).AddTo(_disposables);
 
             if (HasInstance)
             {
@@ -40,21 +48,10 @@ namespace com.IvanMurzak.Unity.MCP.Common
         }
 
         public Task<bool> Connect(CancellationToken cancellationToken = default)
-        {
-            RemoteServer?.Connect(cancellationToken);
-            return _rpcRouter.Connect(cancellationToken).ContinueWith(task =>
-            {
-                if (task.IsCompletedSuccessfully && task.Result)
-                    RemoteServer?.NotifyAboutUpdatedTools();
-                return task.IsCompletedSuccessfully;
-            });
-        }
+            => _rpcRouter.Connect(cancellationToken);
 
         public Task Disconnect(CancellationToken cancellationToken = default)
-        {
-            RemoteServer?.Disconnect(cancellationToken);
-            return _rpcRouter.Disconnect(cancellationToken);
-        }
+            => _rpcRouter.Disconnect(cancellationToken);
 
         public void Dispose()
         {
@@ -67,6 +64,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
         public async Task DisposeAsync()
         {
+            _disposables.Dispose();
+
             var localInstance = _instance.CurrentValue;
             if (localInstance == this)
                 _instance.Value = null;
@@ -74,7 +73,6 @@ namespace com.IvanMurzak.Unity.MCP.Common
             try
             {
                 await _rpcRouter.DisposeAsync();
-                await RemoteServer.DisposeAsync();
 
                 if (localInstance != null)
                     await localInstance.DisposeAsync();

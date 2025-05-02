@@ -10,7 +10,6 @@ namespace com.IvanMurzak.Unity.MCP.Common
 {
     public interface IMcpPlugin : IConnection, IDisposableAsync
     {
-        IRemoteServer? RemoteServer { get; }
         IMcpRunner McpRunner { get; }
     }
     public interface IConnection : IDisposableAsync
