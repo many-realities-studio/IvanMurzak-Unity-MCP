@@ -10,7 +10,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
 {
     public partial class McpPlugin : IMcpPlugin
     {
-        public const string Version = "0.1.0";
+        public const string Version = "0.7.0";
 
         readonly ILogger<McpPlugin> _logger;
         readonly IRpcRouter _rpcRouter;
@@ -23,7 +23,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public McpPlugin(ILogger<McpPlugin> logger, IRpcRouter rpcRouter, IMcpRunner mcpRunner, IRemoteServer remoteServer)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logger.LogTrace("Ctor. Version: {0}", Version);
+            _logger.LogTrace("{0} Ctor. Version: {Version}", typeof(McpPlugin).Name, Version);
 
             _rpcRouter = rpcRouter ?? throw new ArgumentNullException(nameof(rpcRouter));
 
