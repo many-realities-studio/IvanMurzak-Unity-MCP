@@ -68,6 +68,7 @@
     },
     "dotnet.defaultSolution": "Unity-MCP.sln",
     "cSpell.words": [
-        "Murzak"
+        "Murzak",
+        "playmode"
     ]
 }
