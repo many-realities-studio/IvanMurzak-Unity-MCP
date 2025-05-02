@@ -17,7 +17,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             ILogger logger,
             IHubContext<THub> hubContext,
             string methodName,
-            string connectionId,
+            string? connectionId,
             TRequest requestData,
             CancellationToken cancellationToken = default)
             where TRequest : IRequestID

@@ -12,8 +12,10 @@ namespace com.IvanMurzak.Unity.MCP.Common.Data
                 return response;
 
             foreach (var item in response)
+            {
+                logger.LogInformation(ex, item.Name);
                 logger.LogInformation(ex, JsonUtils.ToJson(item));
-
+            }
             return response;
         }
 

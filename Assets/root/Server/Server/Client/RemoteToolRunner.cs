@@ -19,16 +19,16 @@ namespace com.IvanMurzak.Unity.MCP.Server
         public RemoteToolRunner(ILogger<RemoteToolRunner> logger, IHubContext<RemoteApp> remoteAppContext)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logger.LogTrace("Ctor.");
+            _logger.LogTrace("{0} Ctor.", typeof(RemoteToolRunner).Name);
             _remoteAppContext = remoteAppContext ?? throw new ArgumentNullException(nameof(remoteAppContext));
         }
 
-        public Task<IResponseData<ResponseCallTool>> RunCallTool(IRequestCallTool requestData, string? connectionId = null, CancellationToken cancellationToken = default)
+        public Task<IResponseData<ResponseCallTool>> RunCallTool(IRequestCallTool requestData, string? connectionId, CancellationToken cancellationToken = default)
             => ClientUtils.InvokeAsync<IRequestCallTool, ResponseCallTool, RemoteApp>(
                 logger: _logger,
                 hubContext: _remoteAppContext,
                 methodName: Consts.RPC.Client.RunCallTool,
-                connectionId: connectionId!,
+                connectionId: connectionId,
                 requestData: requestData,
                 cancellationToken: CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken).Token)
                 .ContinueWith(task =>
@@ -40,12 +40,12 @@ namespace com.IvanMurzak.Unity.MCP.Server
                 return response;
             }, cancellationToken: CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken).Token);
 
-        public Task<IResponseData<ResponseListTool[]>> RunListTool(IRequestListTool requestData, string? connectionId = null, CancellationToken cancellationToken = default)
+        public Task<IResponseData<ResponseListTool[]>> RunListTool(IRequestListTool requestData, string? connectionId, CancellationToken cancellationToken = default)
             => ClientUtils.InvokeAsync<IRequestListTool, ResponseListTool[], RemoteApp>(
                 logger: _logger,
                 hubContext: _remoteAppContext,
                 methodName: Consts.RPC.Client.RunListTool,
-                connectionId: connectionId!,
+                connectionId: connectionId,
                 requestData: requestData,
                 cancellationToken: CancellationTokenSource.CreateLinkedTokenSource(cts.Token, cancellationToken).Token)
                 .ContinueWith(task =>
@@ -59,7 +59,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
 
         public void Dispose()
         {
-            _logger.LogTrace("Dispose.");
+            _logger.LogTrace("{0} Dispose.", typeof(RemoteToolRunner).Name);
             _disposables.Dispose();
 
             if (!cts.IsCancellationRequested)

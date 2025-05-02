@@ -21,7 +21,11 @@ namespace com.IvanMurzak.Unity.MCP.Common
         {
             builder.AddMcpRunner();
 
-            // // TODO: Oncomment if any tools or prompts are needed from this assembly
+            builder.Services.AddSingleton<RpcRouter>();
+            builder.Services.AddSingleton<IRpcRouter>(sp => sp.GetRequiredService<RpcRouter>());
+            builder.Services.AddSingleton<IRemoteServer>(sp => sp.GetRequiredService<RpcRouter>());
+
+            // // TODO: Uncomment if any tools or prompts are needed from this assembly
             // // var assembly = typeof(McpAppBuilderExtensions).Assembly;
 
             // // builder.WithToolsFromAssembly(assembly);

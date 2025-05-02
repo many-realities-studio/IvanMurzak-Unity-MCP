@@ -24,9 +24,18 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (toolRunner == null)
                 return new ListToolsResult().SetError($"[Error] '{nameof(toolRunner)}' is null");
 
-            var requestData = new RequestListTool();
+            while (RemoteApp.FirstConnectionId == null)
+                await Task.Delay(100, cancellationToken);
 
-            var response = await toolRunner.RunListTool(requestData, cancellationToken: cancellationToken);
+            var clientConnectionId = RemoteApp.FirstConnectionId;
+            if (string.IsNullOrEmpty(clientConnectionId))
+            {
+                logger.Warn("{0}.ListAll, no connected client. Returning empty success result.", typeof(ToolRouter).Name);
+                return new ListToolsResult();
+            }
+
+            var requestData = new RequestListTool();
+            var response = await toolRunner.RunListTool(requestData, clientConnectionId, cancellationToken: cancellationToken);
             if (response == null)
                 return new ListToolsResult().SetError($"[Error] '{nameof(response)}' is null");
 

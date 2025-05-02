@@ -102,7 +102,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             //     return "[Error] Tool returned null value";
 
             // // logger.Trace("Call, result: {0}", JsonSerializer.Serialize(response.Value));
-            // return response.Value.ToCallToolRespose();
+            // return response.Value.ToCallToolResponse();
         }
     }
 }

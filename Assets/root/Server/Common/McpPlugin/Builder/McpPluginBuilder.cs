@@ -26,10 +26,6 @@ namespace com.IvanMurzak.Unity.MCP.Common
             _services.AddSingleton(_tools);
             _services.AddSingleton(_resources);
 
-            _services.AddSingleton<RpcRouter>();
-            _services.AddSingleton<IRpcRouter>(sp => sp.GetRequiredService<RpcRouter>());
-            _services.AddSingleton<IRemoteServer>(sp => sp.GetRequiredService<RpcRouter>());
-
             Func<string, Task<HubConnection>> hubConnectionBuilder = (string endpoint) =>
             {
                 var hubConnection = new HubConnectionBuilder()

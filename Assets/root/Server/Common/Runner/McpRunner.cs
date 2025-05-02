@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
 {
     public class McpRunner : IMcpRunner
     {
+        static readonly JsonElement EmptyInputSchema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+        
         protected readonly ILogger<McpRunner> _logger;
         readonly IDictionary<string, IRunTool> _tools;
         readonly IDictionary<string, IRunResource> _resources;
@@ -90,7 +93,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                         Name = kvp.Key,
                         Title = kvp.Value.Title,
                         Description = kvp.Value.Description,
-                        InputSchema = kvp.Value.InputSchema.ToJsonElement() ?? new()
+                        InputSchema = kvp.Value.InputSchema.ToJsonElement() ?? EmptyInputSchema,
                     })
                     .ToArray();
 
