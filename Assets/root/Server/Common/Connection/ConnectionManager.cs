@@ -10,8 +10,9 @@ namespace com.IvanMurzak.Unity.MCP.Common
 {
     public class ConnectionManager : IConnectionManager
     {
-        public const string Version = "0.1.0";
+        public const string Version = "0.7.0";
 
+        readonly string _guid = Guid.NewGuid().ToString();
         readonly ILogger<ConnectionManager> _logger;
         readonly ReactiveProperty<HubConnection> _hubConnection = new();
         readonly Func<string, Task<HubConnection>> _hubConnectionBuilder;
@@ -31,7 +32,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public ConnectionManager(ILogger<ConnectionManager> logger, Func<string, Task<HubConnection>> hubConnectionBuilder)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-            _logger.LogTrace("Ctor. Version: {0}", Version);
+            _logger.LogTrace("{0} Ctor. Version: {1}", _guid, Version);
 
             _hubConnectionBuilder = hubConnectionBuilder ?? throw new ArgumentNullException(nameof(hubConnectionBuilder));
             _hubConnection.Subscribe(hubConnection =>
@@ -61,7 +62,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 await Connect(cancellationToken);
                 if (_hubConnection.Value?.State != HubConnectionState.Connected)
                 {
-                    _logger.LogError("Can't establish connection with Remote.");
+                    _logger.LogError("{0} Can't establish connection with Remote.", _guid);
                     return;
                 }
             }
@@ -71,7 +72,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 if (task.IsCompletedSuccessfully)
                     return;
 
-                _logger.LogError("Failed to invoke method {0}: {1}", methodName, task.Exception?.Message);
+                _logger.LogError("{0} Failed to invoke method {1}: {2}", _guid, methodName, task.Exception?.Message);
             });
         }
 
@@ -82,7 +83,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 await Connect(cancellationToken);
                 if (_hubConnection.Value?.State != HubConnectionState.Connected)
                 {
-                    _logger.LogError("Can't establish connection with Remote.");
+                    _logger.LogError("{0} Can't establish connection with Remote.", _guid);
                     return default!;
                 }
             }
@@ -92,13 +93,21 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 if (task.IsCompletedSuccessfully)
                     return task.Result;
 
-                _logger.LogError("Failed to invoke method {0}: {1}", methodName, task.Exception?.Message);
+                _logger.LogError("{0} Failed to invoke method {1}: {21}", _guid, methodName, task.Exception?.Message);
                 return default!;
             });
         }
 
         public async Task<bool> Connect(CancellationToken cancellationToken = default)
         {
+            _logger.LogDebug("{0} Connect.", _guid);
+
+            if (_hubConnection.Value?.State == HubConnectionState.Connected)
+            {
+                _logger.LogDebug("{0} Already connected. Ignoring.", _guid);
+                return true;
+            }
+
             _continueToReconnect.Value = false;
 
             // Dispose the previous internal CancellationTokenSource if it exists
@@ -109,14 +118,11 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
             _continueToReconnect.Value = true;
 
-            if (_hubConnection.Value?.State == HubConnectionState.Connected)
-                return true;
-
             internalCts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             if (connectionTask != null)
             {
-                _logger.LogDebug("Connection task already exists. Waiting for the completion... {0}.", Endpoint);
+                _logger.LogDebug("{0} Connection task already exists. Waiting for the completion... {1}.", _guid, Endpoint);
                 // Create a new task that waits for the existing task but can be canceled independently
                 return await Task.Run(async () =>
                 {
@@ -127,7 +133,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                     }
                     catch (OperationCanceledException)
                     {
-                        _logger.LogWarning("Connection task was canceled {0}.", Endpoint);
+                        _logger.LogWarning("{0} Connection task was canceled {1}.", _guid, Endpoint);
                         return false;
                     }
                 }, internalCts.Token);
@@ -140,7 +146,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
             }
             catch (Exception ex)
             {
-                _logger.LogError("Error during connection: {0}\n{1}", ex.Message, ex.StackTrace);
+                _logger.LogError("{0} Error during connection: {1}\n{2}", _guid, ex.Message, ex.StackTrace);
                 return false;
             }
             finally
@@ -168,18 +174,18 @@ namespace com.IvanMurzak.Unity.MCP.Common
         {
             if (_hubConnection.Value == null)
             {
-                _logger.LogDebug("Creating new HubConnection instance {0}.", Endpoint);
+                _logger.LogDebug("{0} Creating new HubConnection instance {1}.", _guid, Endpoint);
                 var hubConnection = await _hubConnectionBuilder(Endpoint);
                 if (hubConnection == null)
                 {
-                    _logger.LogError("Can't create connection instance. Something may be wrong with Connection Config {0}.", Endpoint);
+                    _logger.LogError("{0} Can't create connection instance. Something may be wrong with Connection Config {1}.", _guid, Endpoint);
                     return false;
                 }
 
                 _hubConnection.Value = hubConnection;
 
                 hubConnectionLogger?.Dispose();
-                hubConnectionLogger = new(_logger, hubConnection);
+                hubConnectionLogger = new(_logger, hubConnection, guid: _guid);
 
                 hubConnectionObservable?.Dispose();
                 hubConnectionObservable = new(hubConnection);
@@ -190,13 +196,13 @@ namespace com.IvanMurzak.Unity.MCP.Common
                         connectionTask = null;
                         if (cancellationToken.IsCancellationRequested)
                             return;
-                        _logger.LogWarning("Connection closed. Attempting to reconnect... {0}.", Endpoint);
+                        _logger.LogWarning("{0} Connection closed. Attempting to reconnect... {1}.", _guid, Endpoint);
                         await InternalConnect(cancellationToken);
                     })
                     .RegisterTo(cancellationToken);
             }
 
-            _logger.LogDebug("Connecting to {0}...", Endpoint);
+            _logger.LogDebug("{0} Connecting to {1}...", _guid, Endpoint);
             while (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
             {
                 var cts = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
@@ -208,18 +214,18 @@ namespace com.IvanMurzak.Unity.MCP.Common
                     {
                         if (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
                         {
-                            _logger.LogTrace("Waiting before retry... {0}", Endpoint);
+                            _logger.LogTrace("{0} Waiting before retry... {1}", _guid, Endpoint);
                             await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken); // Wait before retrying
                         }
                         continue;
                     }
-                    _logger.LogInformation("Connection started successfully {0}.", Endpoint);
+                    _logger.LogInformation("{0} Connection started successfully {1}.", _guid, Endpoint);
                     _connectionState.Value = HubConnectionState.Connected;
                     return true;
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning("Failed to start connection. {0} - {1}\n{2}", Endpoint, ex.Message, ex.StackTrace);
+                    _logger.LogWarning("{0} Failed to start connection. {1} - {2}\n{3}", _guid, Endpoint, ex.Message, ex.StackTrace);
                 }
                 finally
                 {
@@ -228,7 +234,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 }
                 if (_continueToReconnect.CurrentValue && !cancellationToken.IsCancellationRequested)
                 {
-                    _logger.LogTrace("Waiting before retry... {0}", Endpoint);
+                    _logger.LogTrace("{0} Waiting before retry... {1}", _guid, Endpoint);
                     await Task.Delay(TimeSpan.FromSeconds(5), cancellationToken); // Wait before retrying
                 }
             }
@@ -237,6 +243,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
         public Task Disconnect(CancellationToken cancellationToken = default)
         {
+            _logger.LogDebug("{0} Disconnect.", _guid);
             connectionTask = null;
             _continueToReconnect.Value = false;
 
@@ -250,11 +257,11 @@ namespace com.IvanMurzak.Unity.MCP.Common
             {
                 if (task.IsCompletedSuccessfully)
                 {
-                    _logger.LogInformation("HubConnection stopped successfully.");
+                    _logger.LogInformation("{0} HubConnection stopped successfully.", _guid);
                 }
                 else if (task.Exception != null)
                 {
-                    _logger.LogError("Error while stopping HubConnection: {0}\n{1}", task.Exception.Message, task.Exception.StackTrace);
+                    _logger.LogError("{0} Error while stopping HubConnection: {1}\n{2}", _guid, task.Exception.Message, task.Exception.StackTrace);
                 }
                 _connectionState.Value = HubConnectionState.Disconnected;
             });
@@ -271,6 +278,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
         public async Task DisposeAsync()
         {
+            _logger.LogTrace("{0} DisposeAsync.", _guid);
+
             connectionTask = null;
             _disposables.Dispose();
 
