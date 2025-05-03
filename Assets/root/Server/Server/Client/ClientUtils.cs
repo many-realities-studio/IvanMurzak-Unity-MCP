@@ -28,16 +28,19 @@ namespace com.IvanMurzak.Unity.MCP.Server
                     .Log(logger);
 
             if (hubContext == null)
-                return ResponseData<TResponse>.Error(requestData.RequestID, "HubContext is null.").Log(logger);
+                return ResponseData<TResponse>.Error(requestData.RequestID, $"'{nameof(hubContext)}' is null.").Log(logger);
 
             if (string.IsNullOrEmpty(methodName))
-                return ResponseData<TResponse>.Error(requestData.RequestID, "Method name is null.").Log(logger);
+                return ResponseData<TResponse>.Error(requestData.RequestID, $"'{nameof(methodName)}' is null.").Log(logger);
 
-            // if (string.IsNullOrEmpty(requestData.Name))
-            //     return ResponseData<TResponse>.Error(requestData.RequestID, "Tool.Name is null.")
-            //         .Log(logger);
             try
             {
+                if (logger.IsEnabled(LogLevel.Trace))
+                {
+                    var allConnections = string.Join(", ", RemoteApp.AllConnections);
+                    logger.LogTrace("ConnectionId: {0}. Invoke '{1}':\n{2}\nAvailable connections: {3}", connectionId, methodName, requestData, allConnections);
+                }
+
                 // if (logger.IsEnabled(LogLevel.Information))
                 // {
                 //     var message = requestData.Arguments == null

@@ -46,7 +46,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             {
                 if (string.IsNullOrEmpty(clientConnectionId))
                 {
-                    logger.Warn("{0}.ListAll, no connected client. Returning empty success result.", typeof(ToolRouter).Name);
+                    logger.Warn("{0}.Call, no connected client. Returning empty success result.", typeof(ToolRouter).Name);
                     return new CallToolResponse().SetError($"[Error] '{nameof(clientConnectionId)}' is null");
                 }
             }
