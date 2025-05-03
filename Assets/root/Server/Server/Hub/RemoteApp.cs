@@ -11,7 +11,9 @@ namespace com.IvanMurzak.Unity.MCP.Server
 {
     public class RemoteApp : BaseHub<RemoteApp>, IRemoteApp
     {
-        public static string? FirstConnectionId => ConnectedClients.FirstOrDefault().Value?.FirstOrDefault().Key;
+        public static string? FirstConnectionId => ConnectedClients.TryGetValue(typeof(RemoteApp), out var clients)
+            ? clients?.FirstOrDefault().Key
+            : null;
         
         readonly EventAppToolsChange _eventAppToolsChange;
 

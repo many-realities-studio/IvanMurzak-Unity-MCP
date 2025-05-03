@@ -52,7 +52,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
                     })
                     .WithStdioServerTransport()
                     //.WithPromptsFromAssembly()
-                    //.WithToolsFromAssembly()
+                    .WithToolsFromAssembly()
                     .WithCallToolHandler(ToolRouter.Call)
                     .WithListToolsHandler(ToolRouter.ListAll);
                 //.WithReadResourceHandler(ResourceRouter.ReadResource)

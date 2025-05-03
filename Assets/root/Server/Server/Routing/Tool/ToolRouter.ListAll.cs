@@ -24,8 +24,8 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (toolRunner == null)
                 return new ListToolsResult().SetError($"[Error] '{nameof(toolRunner)}' is null");
 
-            while (RemoteApp.FirstConnectionId == null)
-                await Task.Delay(100, cancellationToken);
+            // while (RemoteApp.FirstConnectionId == null)
+            //     await Task.Delay(100, cancellationToken);
 
             var clientConnectionId = RemoteApp.FirstConnectionId;
             if (string.IsNullOrEmpty(clientConnectionId))

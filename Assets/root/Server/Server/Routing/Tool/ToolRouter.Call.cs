@@ -38,11 +38,24 @@ namespace com.IvanMurzak.Unity.MCP.Server
             if (toolRunner == null)
                 return new CallToolResponse().SetError($"[Error] '{nameof(toolRunner)}' is null");
 
+            // while (RemoteApp.FirstConnectionId == null)
+            //     await Task.Delay(100, cancellationToken);
+
+            var clientConnectionId = RemoteApp.FirstConnectionId;
+            if (mcpServerService.McpRunner.HasTool(request.Params.Name))
+            {
+                if (string.IsNullOrEmpty(clientConnectionId))
+                {
+                    logger.Warn("{0}.ListAll, no connected client. Returning empty success result.", typeof(ToolRouter).Name);
+                    return new CallToolResponse().SetError($"[Error] '{nameof(clientConnectionId)}' is null");
+                }
+            }
+
             var requestData = new RequestCallTool(request.Params.Name, request.Params.Arguments);
             if (logger.IsTraceEnabled)
                 logger.Trace("Call remote tool '{0}':\n{1}", request.Params.Name, JsonUtils.Serialize(requestData));
 
-            var response = await toolRunner.RunCallTool(requestData, cancellationToken: cancellationToken);
+            var response = await toolRunner.RunCallTool(requestData, connectionId: clientConnectionId, cancellationToken: cancellationToken);
             if (response == null)
                 return new CallToolResponse().SetError($"[Error] '{nameof(response)}' is null");
 
