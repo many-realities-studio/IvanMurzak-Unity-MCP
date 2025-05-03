@@ -315,10 +315,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
                     _logger.LogError("Error during async disposal: {0}\n{1}", ex.Message, ex.StackTrace);
                 }
             }
-            else
-            {
-                _hubConnection.Dispose();
-            }
+            
+            _hubConnection.Dispose();            
         }
 
         ~ConnectionManager() => Dispose();
