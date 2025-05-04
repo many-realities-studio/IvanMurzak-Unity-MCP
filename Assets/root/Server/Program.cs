@@ -73,12 +73,11 @@ namespace com.IvanMurzak.Unity.MCP.Server
                         {
 
                         });
-                });
-
-                // builder.WebHost.UseUrls(Consts.Hub.DefaultEndpoint);
+                });                // builder.WebHost.UseUrls(Consts.Hub.DefaultEndpoint);
                 builder.WebHost.UseKestrel(options =>
                 {
-                    options.ListenLocalhost(GetPort(args));
+                    // Use ListenAnyIP instead of ListenLocalhost to make the server accessible from Windows host
+                    options.ListenAnyIP(GetPort(args));
                 });
 
                 var app = builder.Build();

@@ -1,0 +1,12 @@
+{
+    "servers": {
+        "unity-mcp-server": {
+            "type": "stdio",
+            "command": "bash",
+            "args": [
+                "-c",
+                "cd ${workspaceFolder} && dotnet \"${workspaceFolder}/Library/com.ivanmurzak.unity.mcp.server/bin~/Release/net9.0/com.IvanMurzak.Unity.MCP.Server.dll\" 60606 --urls http://0.0.0.0:60606"
+            ]
+        }
+    }
+}
