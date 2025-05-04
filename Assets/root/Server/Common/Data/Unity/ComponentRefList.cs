@@ -9,13 +9,13 @@ Use one of the following properties:
 1. 'instanceID' (int) - recommended. It finds the exact Component. Default value is 0.
 2. 'index' (int) - finds Component by index. It may find a wrong Component. Default value is -1.
 3. 'name' (string) - finds Component by name. It may find a wrong Component. Default value is null.")]
-    public class ComponentRefList : List<GameObjectRef>
+    public class ComponentRefList : List<ComponentRef>
     {
         public ComponentRefList() { }
 
         public ComponentRefList(int capacity) : base(capacity) { }
 
-        public ComponentRefList(IEnumerable<GameObjectRef> collection) : base(collection) { }
+        public ComponentRefList(IEnumerable<ComponentRef> collection) : base(collection) { }
 
         public override string ToString()
         {

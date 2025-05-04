@@ -18,9 +18,8 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
 Returns list of all available components preview if no requested components found.")]
         public string GetComponents
         (
-            [Description("The 'instanceID' array of the target components. Leave it empty if all components needed.")]
-            int[] componentInstanceIDs,
-            GameObjectRef gameObjectRef
+            GameObjectRef gameObjectRef,
+            ComponentRefList? filterComponentRefs = null
         )
         => MainThread.Run(() =>
         {
@@ -30,18 +29,18 @@ Returns list of all available components preview if no requested components foun
 
             var allComponents = go.GetComponents<UnityEngine.Component>();
 
-            var needToFilterComponents = componentInstanceIDs != null && componentInstanceIDs.Length > 0;
+            var needToFilterComponents = (filterComponentRefs?.Count ?? 0) > 0;
 
             var tempComponents = needToFilterComponents
-                ? allComponents.Where(c => componentInstanceIDs.Contains(c.GetInstanceID()))
+                ? allComponents.Where(c => filterComponentRefs.Any(fcr => fcr.Matches(c)))
                 : allComponents;
 
             var components = tempComponents
-                    .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]"))
-                    .ToList();
+                .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]"))
+                .ToList();
 
             if (components.Count == 0)
-                return Error.NotFoundComponents(componentInstanceIDs, allComponents);
+                return Error.NotFoundComponents(filterComponentRefs, allComponents);
 
             var componentsJson = JsonUtils.Serialize(components);
 
