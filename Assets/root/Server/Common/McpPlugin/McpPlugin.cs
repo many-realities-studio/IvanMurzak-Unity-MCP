@@ -43,6 +43,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
             }
 
             _instance.Value = this;
+
+            // Dispose if another instance is created, because only one instance is allowed.
             _instance
                 .Where(instance => instance != this)
                 .Subscribe(instance => Dispose())
