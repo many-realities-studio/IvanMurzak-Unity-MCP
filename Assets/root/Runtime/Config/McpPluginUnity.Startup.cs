@@ -12,6 +12,7 @@ namespace com.IvanMurzak.Unity.MCP
 
     public partial class McpPluginUnity
     {
+        [UnityEditor.MenuItem("Tools/AI Connector (Unity-MCP)/Build & Start")]
         public static void BuildAndStart()
         {
             // if (McpPluginUnity.LogLevel.IsActive(LogLevel.Trace))
