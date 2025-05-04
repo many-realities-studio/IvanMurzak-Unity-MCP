@@ -1,4 +1,4 @@
-﻿#if !IGNORE
+﻿#if !UNITY_ENV
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
