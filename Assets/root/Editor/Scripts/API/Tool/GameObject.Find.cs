@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
+using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using com.IvanMurzak.Unity.MCP.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Editor.API
@@ -20,20 +21,15 @@ Returns GameObject information and its children.
 Also, it returns Components preview just for the target GameObject.")]
         public string Find
         (
+            GameObjectRef gameObjectRef,
             [Description("Determines the depth of the hierarchy to include. 0 - means only the target GameObject. 1 - means to include one layer below.")]
-            int includeChildrenDepth = 0,
-            [Description("Find by 'instanceID' (int). Priority: 1. (Recommended)")]
-            int instanceID = 0,
-            [Description("Find by 'path'. Priority: 2.")]
-            string? path = null,
-            [Description("Find by 'name'. Priority: 3.")]
-            string? name = null
+            int includeChildrenDepth = 0
         )
         {
             return MainThread.Run(() =>
             {
                 // Find by 'instanceID' first, then by 'path', then by 'name'
-                var go = GameObjectUtils.FindBy(instanceID, path, name, out var error);
+                var go = GameObjectUtils.FindBy(gameObjectRef, out var error);
                 if (error != null)
                     return error;
 
