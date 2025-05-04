@@ -15,7 +15,7 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
         [Description(@"Finds specific GameObject by provided information.
 First it looks for the opened Prefab, if any Prefab is opened it looks only there ignoring a scene.
 If no opened Prefab it looks into current active scene.
-Returns GameObject infromation and its children.
+Returns GameObject information and its children.
 Also, it returns Components preview just for the target GameObject.")]
         public Task<CallToolResponse> Find
         (

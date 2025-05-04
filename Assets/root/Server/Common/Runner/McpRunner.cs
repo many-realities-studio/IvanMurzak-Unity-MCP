@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading;
 using System.Threading.Tasks;
@@ -12,6 +13,8 @@ namespace com.IvanMurzak.Unity.MCP.Common
 {
     public class McpRunner : IMcpRunner
     {
+        static readonly JsonElement EmptyInputSchema = JsonDocument.Parse("{\"type\":\"object\"}").RootElement;
+        
         protected readonly ILogger<McpRunner> _logger;
         readonly IDictionary<string, IRunTool> _tools;
         readonly IDictionary<string, IRunResource> _resources;
@@ -41,7 +44,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public bool HasTool(string name) => _tools.ContainsKey(name);
         public bool HasResource(string name) => _resources.ContainsKey(name);
 
-        public async Task<IResponseData<ResponseCallTool>> RunCallTool(IRequestCallTool data, CancellationToken cancellationToken = default)
+        public async Task<IResponseData<ResponseCallTool>> RunCallTool(IRequestCallTool data, string? connectionId = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 return ResponseData<ResponseCallTool>.Error(Consts.Guid.Zero, "Tool data is null.")
@@ -79,7 +82,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
             }
         }
 
-        public Task<IResponseData<ResponseListTool[]>> RunListTool(IRequestListTool data, CancellationToken cancellationToken = default)
+        public Task<IResponseData<ResponseListTool[]>> RunListTool(IRequestListTool data, string? connectionId = null, CancellationToken cancellationToken = default)
         {
             try
             {
@@ -90,7 +93,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                         Name = kvp.Key,
                         Title = kvp.Value.Title,
                         Description = kvp.Value.Description,
-                        InputSchema = kvp.Value.InputSchema.ToJsonElement() ?? new()
+                        InputSchema = kvp.Value.InputSchema.ToJsonElement() ?? EmptyInputSchema,
                     })
                     .ToArray();
 
@@ -108,7 +111,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
             }
         }
 
-        public async Task<IResponseData<ResponseResourceContent[]>> RunResourceContent(IRequestResourceContent data, CancellationToken cancellationToken = default)
+        public async Task<IResponseData<ResponseResourceContent[]>> RunResourceContent(IRequestResourceContent data, string? connectionId = null, CancellationToken cancellationToken = default)
         {
             if (data == null)
                 throw new ArgumentException("Resource data is null.");
@@ -130,7 +133,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
             return result.Pack(data.RequestID);
         }
 
-        public async Task<IResponseData<ResponseListResource[]>> RunListResources(IRequestListResources data, CancellationToken cancellationToken = default)
+        public async Task<IResponseData<ResponseListResource[]>> RunListResources(IRequestListResources data, string? connectionId = null, CancellationToken cancellationToken = default)
         {
             var tasks = _resources.Values
                 .Select(resource => resource.RunListContext.Run());
@@ -143,7 +146,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 .Pack(data.RequestID);
         }
 
-        public Task<IResponseData<ResponseResourceTemplate[]>> RunResourceTemplates(IRequestListResourceTemplates data, CancellationToken cancellationToken = default)
+        public Task<IResponseData<ResponseResourceTemplate[]>> RunResourceTemplates(IRequestListResourceTemplates data, string? connectionId = null, CancellationToken cancellationToken = default)
             => _resources.Values
                 .Select(resource => new ResponseResourceTemplate(resource.Route, resource.Name, resource.Description, resource.MimeType))
                 .ToArray()

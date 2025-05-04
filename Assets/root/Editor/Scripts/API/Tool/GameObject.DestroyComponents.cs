@@ -13,9 +13,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_DestroyComponents",
-            Title = "Destroy Components from a GameObject in opened Prefab or in a Scene",
-            Description = "Destroy one or many components from target GameObject."
+            Title = "Destroy Components from a GameObject in opened Prefab or in a Scene"
         )]
+        [Description("Destroy one or many components from target GameObject.")]
         public string DestroyComponents
         (
             [Description("The 'instanceID' array of the target components.")]

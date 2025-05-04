@@ -66,5 +66,9 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj",
     },
-    "dotnet.defaultSolution": "Unity-MCP.sln"
+    "dotnet.defaultSolution": "Unity-MCP.sln",
+    "cSpell.words": [
+        "Murzak",
+        "playmode"
+    ]
 }
