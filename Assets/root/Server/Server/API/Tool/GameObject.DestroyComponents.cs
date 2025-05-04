@@ -16,15 +16,14 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
         [Description("Destroy one or many components from target GameObject.")]
         public Task<CallToolResponse> DestroyComponents
         (
-            [Description("The 'instanceID' array of the target components.")]
-            int[] componentInstanceIDs,
-            GameObjectRef gameObjectRef
+            GameObjectRef gameObjectRef,
+            ComponentRefList destroyComponentRefs
         )
         {
             return ToolRouter.Call("GameObject_DestroyComponents", arguments =>
             {
-                arguments[nameof(componentInstanceIDs)] = componentInstanceIDs;
                 arguments[nameof(gameObjectRef)] = gameObjectRef;
+                arguments[nameof(destroyComponentRefs)] = destroyComponentRefs ?? new();
             });
         }
     }

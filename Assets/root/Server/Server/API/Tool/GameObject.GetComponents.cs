@@ -23,8 +23,8 @@ Returns list of all available components preview if no requested components foun
         {
             return ToolRouter.Call("GameObject_GetComponents", arguments =>
             {
-                arguments[nameof(filterComponents)] = filterComponents ?? new();
                 arguments[nameof(gameObjectRef)] = gameObjectRef;
+                arguments[nameof(filterComponents)] = filterComponents ?? new();
             });
         }
     }
