@@ -26,6 +26,10 @@ namespace com.IvanMurzak.Unity.MCP.Editor
         //     McpPlugin.Instance.Disconnect();
         // }
 
+
+        [MenuItem("Tools/AI Connector (Unity-MCP)/Build & Start", priority = 1000)]
+        public static void BuildAndStart() => McpPluginUnity.BuildAndStart();
+
         [MenuItem("Tools/AI Connector (Unity-MCP)/Build MCP Server", priority = 1010)]
         public static Task BuildMcpServer() => Startup.BuildServer();
 
