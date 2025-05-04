@@ -299,6 +299,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 try
                 {
                     var tempHubConnection = _hubConnection.Value;
+                    _hubConnection.Value = null;
                     _hubConnection.Dispose();
                     await tempHubConnection.StopAsync()
                         .ContinueWith(task =>
