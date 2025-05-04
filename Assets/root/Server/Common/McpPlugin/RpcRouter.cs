@@ -9,7 +9,7 @@ using R3;
 
 namespace com.IvanMurzak.Unity.MCP.Common
 {
-    public class RpcRouter : IRpcRouter, IRemoteServer
+    public class RpcRouter : IRpcRouter
     {
         readonly ILogger<RpcRouter> _logger;
         readonly IMcpRunner _mcpRunner;
