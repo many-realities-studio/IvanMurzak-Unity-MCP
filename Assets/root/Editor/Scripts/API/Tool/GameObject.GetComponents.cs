@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
+using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using com.IvanMurzak.Unity.MCP.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Editor.API
@@ -19,16 +20,11 @@ Returns list of all available components preview if no requested components foun
         (
             [Description("The 'instanceID' array of the target components. Leave it empty if all components needed.")]
             int[] componentInstanceIDs,
-            [Description("GameObject by 'instanceID' (int). Priority: 1. (Recommended)")]
-            int instanceID = 0,
-            [Description("GameObject by 'path'. Priority: 2.")]
-            string? path = null,
-            [Description("GameObject by 'name'. Priority: 3.")]
-            string? name = null
+            GameObjectRef gameObjectRef
         )
         => MainThread.Run(() =>
         {
-            var go = GameObjectUtils.FindBy(instanceID, path, name, out var error);
+            var go = GameObjectUtils.FindBy(gameObjectRef, out var error);
             if (error != null)
                 return error;
 

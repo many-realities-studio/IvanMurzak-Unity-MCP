@@ -1,3 +1,4 @@
+using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using ModelContextProtocol.Protocol.Types;
 using ModelContextProtocol.Server;
 using System.ComponentModel;
@@ -18,24 +19,13 @@ Returns list of all available components preview if no requested components foun
         (
             [Description("The 'instanceID' array of the target components. Leave it empty if all components needed.")]
             int[] componentInstanceIDs,
-            [Description("GameObject by 'instanceID' (int). Priority: 1. (Recommended)")]
-            int instanceID = 0,
-            [Description("GameObject by 'path'. Priority: 2.")]
-            string? path = null,
-            [Description("GameObject by 'name'. Priority: 3.")]
-            string? name = null
+            GameObjectRef gameObjectRef
         )
         {
             return ToolRouter.Call("GameObject_GetComponents", arguments =>
             {
                 arguments[nameof(componentInstanceIDs)] = componentInstanceIDs;
-                arguments[nameof(instanceID)] = instanceID;
-
-                if (path != null && path.Length > 0)
-                    arguments[nameof(path)] = path;
-
-                if (name != null && name.Length > 0)
-                    arguments[nameof(name)] = name;
+                arguments[nameof(gameObjectRef)] = gameObjectRef;
             });
         }
     }
