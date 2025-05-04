@@ -16,7 +16,7 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
         [Description(@"Set GameObjects in opened Prefab or in a Scene by 'instanceID' (int) array.")]
         public Task<CallToolResponse> SetParent
         (
-            GameObjectRef[] gameObjectRefs,
+            GameObjectRefList gameObjectRefs,
             GameObjectRef parentGameObjectRef,
             [Description("A boolean flag indicating whether the GameObject's world position should remain unchanged when setting its parent.")]
             bool worldPositionStays = true
@@ -24,7 +24,7 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
         {
             return ToolRouter.Call("GameObject_SetParent", arguments =>
             {
-                arguments[nameof(gameObjectRefs)] = gameObjectRefs ?? new GameObjectRef[0];
+                arguments[nameof(gameObjectRefs)] = gameObjectRefs ?? new();
                 arguments[nameof(parentGameObjectRef)] = parentGameObjectRef;
                 arguments[nameof(worldPositionStays)] = worldPositionStays;
             });
