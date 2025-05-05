@@ -29,7 +29,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                 .AddProperty(SerializedMember.FromValue(name: nameof(child.transform.position),
                     value: newPosition)));
 
-            var result = new Tool_GameObject().Modify(values: data.MakeArray(),
+            var result = new Tool_GameObject().Modify(gameObjectDiffs: data.MakeArray(),
                 gameObjectRefs: new Common.Data.Unity.GameObjectRefList
                 {
                     new Common.Data.Unity.GameObjectRef()
@@ -65,7 +65,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                     type: typeof(Material),
                     value: new InstanceID(sharedMaterial.GetInstanceID()))));
 
-            var result = new Tool_GameObject().Modify(values: data.MakeArray(), 
+            var result = new Tool_GameObject().Modify(gameObjectDiffs: data.MakeArray(), 
                 gameObjectRefs: new Common.Data.Unity.GameObjectRefList
                 {
                     new Common.Data.Unity.GameObjectRef()

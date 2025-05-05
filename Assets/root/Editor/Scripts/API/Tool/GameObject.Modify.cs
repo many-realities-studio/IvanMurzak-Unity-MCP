@@ -15,27 +15,28 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "GameObject_Modify",
-            Title = "Modify GameObject in opened Prefab or in a Scene"
+            Title = "Modify GameObjects in opened Prefab or in a Scene"
         )]
-        [Description("Modify GameObject and/or attached component's field and properties.")]
+        [Description(@"Modify GameObjects and/or attached component's field and properties.
+You can modify multiple GameObjects at once. Just provide the same number of GameObject references and SerializedMember objects.")]
         public string Modify
         (
             [Description(@"Json Object with required readonly 'instanceID' and 'type' fields.
 Each field and property requires to have 'type' and 'name' fields to identify the exact modification target.
-Follow the object schema to specify what to change, ignore values that should not be modified.
+Follow the object schema to specify what to change, ignore values that should not be modified. Keep the original data structure.
 Any unknown or wrong located fields and properties will be ignored.
-Check the result of this command to see what was changed. The ignored fields and properties will not be listed.")]
-            SerializedMember[] values,
+Check the result of this command to see what was changed. The ignored fields and properties will be listed.")]
+            SerializedMember[] gameObjectDiffs,
             GameObjectRefList gameObjectRefs
         )
         => MainThread.Run(() =>
         {
             if (gameObjectRefs.Count == 0)
                 return "[Error] No GameObject references provided. Please provide at least one GameObject reference.";
-                
-            if (values.Length != gameObjectRefs.Count)
-                return $"[Error] The number of {nameof(values)} and {nameof(gameObjectRefs)} should be the same. " +
-                    $"{nameof(values)}: {values.Length}, {nameof(gameObjectRefs)}: {gameObjectRefs.Count}";
+
+            if (gameObjectDiffs.Length != gameObjectRefs.Count)
+                return $"[Error] The number of {nameof(gameObjectDiffs)} and {nameof(gameObjectRefs)} should be the same. " +
+                    $"{nameof(gameObjectDiffs)}: {gameObjectDiffs.Length}, {nameof(gameObjectRefs)}: {gameObjectRefs.Count}";
 
             var stringBuilder = new StringBuilder();
 
@@ -47,8 +48,19 @@ Check the result of this command to see what was changed. The ignored fields and
                     stringBuilder.AppendLine(error);
                     continue;
                 }
-                var goObj = (object)go;
-                Serializer.Populate(ref goObj, values[i], stringBuilder);
+                var objToModify = (object)go;
+                var type = TypeUtils.GetType(gameObjectDiffs[i].type);
+                if (typeof(UnityEngine.Component).IsAssignableFrom(type))
+                {
+                    var component = go.GetComponent(type);
+                    if (component == null)
+                    {
+                        stringBuilder.AppendLine($"[Error] Component '{type.FullName}' not found on GameObject '{go.name}'.");
+                        continue;
+                    }
+                    objToModify = component;
+                }
+                Serializer.Populate(ref objToModify, gameObjectDiffs[i], stringBuilder);
             }
 
             return stringBuilder.ToString();
