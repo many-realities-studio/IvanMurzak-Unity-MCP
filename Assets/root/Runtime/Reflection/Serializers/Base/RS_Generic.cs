@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
@@ -46,19 +47,21 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             return true;
         }
 
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             var parsedValue = JsonUtils.Deserialize(value.valueJsonElement?.GetRawText(), type);
             fieldInfo.SetValue(obj, parsedValue);
+            stringBuilder?.AppendLine($"[Success] Field '{value.name}' modified to '{parsedValue}'.");
             return true;
         }
 
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             var parsedValue = JsonUtils.Deserialize(value.valueJsonElement?.GetRawText(), type);
             propertyInfo.SetValue(obj, parsedValue);
+            stringBuilder?.AppendLine($"[Success] Property '{value.name}' modified to '{parsedValue}'.");
             return true;
         }
 

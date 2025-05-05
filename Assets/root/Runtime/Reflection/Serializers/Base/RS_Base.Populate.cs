@@ -74,7 +74,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             try
             {
                 foreach (var populators in Registry.BuildPopulatorsChain(targetType))
-                    populators.SetAsField(ref obj, targetType, fieldInfo, value: fieldValue, flags: flags);
+                    populators.SetAsField(ref obj, targetType, fieldInfo, value: fieldValue, stringBuilder: stringBuilder, flags: flags);
 
                 return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Field '{fieldValue.name}' modified to '{fieldValue.valueJsonElement}'.");
             }
@@ -113,9 +113,9 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             try
             {
                 foreach (var populators in Registry.BuildPopulatorsChain(targetType))
-                    populators.SetAsProperty(ref obj, targetType, propInfo, value: propertyValue, flags: flags);
+                    populators.SetAsProperty(ref obj, targetType, propInfo, value: propertyValue, stringBuilder: stringBuilder, flags: flags);
 
-                return stringBuilder?.AppendLine(new string(' ', depth) + $"[Success] Property '{propertyValue.name}' modified to '{propertyValue.valueJsonElement}'.");
+                return stringBuilder;
             }
             catch (Exception ex)
             {
@@ -124,10 +124,10 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             }
         }
 
-        public abstract bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
+        public abstract bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
-        public abstract bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
+        public abstract bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
 
         public abstract bool SetField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,

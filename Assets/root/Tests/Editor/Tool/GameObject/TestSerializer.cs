@@ -88,7 +88,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
             TestSerializerChain<DateTime, RS_Primitive>(1);
             TestSerializerChain<CultureTypes, RS_Primitive>(1); // enum
             TestSerializerChain<object, RS_Generic<object>>(1);
-            TestSerializerChain<InstanceID, RS_Generic<object>>(1);
+            TestSerializerChain<ObjectRef, RS_Generic<object>>(1);
 
             TestSerializerChain<UnityEngine.Object, RS_UnityEngineObject>(1);
             TestSerializerChain<UnityEngine.Rigidbody, RS_UnityEngineComponent>(1);

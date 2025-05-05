@@ -44,7 +44,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     UnityEngine.Rendering.ShaderPropertyType.Color => material.GetColor(propName),
                     UnityEngine.Rendering.ShaderPropertyType.Vector => material.GetVector(propName),
                     UnityEngine.Rendering.ShaderPropertyType.Texture => material.GetTexture(propName)?.GetInstanceID() != null
-                        ? new InstanceID(material.GetTexture(propName).GetInstanceID())
+                        ? new ObjectRef(material.GetTexture(propName).GetInstanceID())
                         : null,
                     _ => default
                 };
@@ -66,12 +66,12 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                     SerializedMember.FromValue(name: FieldShader, value: shader.name)
                 },
                 properties = properties,
-            }.SetValue(new InstanceID(material.GetInstanceID()));
+            }.SetValue(new ObjectRef(material.GetInstanceID()));
         }
 
         protected override bool SetValue(ref object obj, Type type, JsonElement? value)
         {
-            var serialized = JsonUtils.Deserialize<SerializedMember>(value.Value.GetRawText());
+            var serialized = JsonUtils.Deserialize<SerializedMember>(value.Value);
             var material = obj as Material;
 
             // Set shader

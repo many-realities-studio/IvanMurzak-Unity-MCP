@@ -20,11 +20,11 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
             var data = SerializedMember.FromValue(
                     name: child.name,
                     type: typeof(GameObject),
-                    value: new InstanceID(child.GetInstanceID()))
+                    value: new ObjectRef(child.GetInstanceID()))
                 .AddField(SerializedMember.FromValue(
                     name: nameof(child.transform),
                     type: typeof(Transform),
-                    value: new InstanceID(child.transform.GetInstanceID())
+                    value: new ObjectRef(child.transform.GetInstanceID())
                 )
                 .AddProperty(SerializedMember.FromValue(name: nameof(child.transform.position),
                     value: newPosition)));
@@ -56,14 +56,14 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
             var data = SerializedMember.FromValue(
                     name: go.name,
                     type: typeof(GameObject),
-                    value: new InstanceID(go.GetInstanceID()))
+                    value: new ObjectRef(go.GetInstanceID()))
                 .AddField(SerializedMember.FromValue(name: "",
                     type: typeof(MeshRenderer),
-                    value: new InstanceID(component.GetInstanceID())
+                    value: new ObjectRef(component.GetInstanceID())
                 )
                 .AddProperty(SerializedMember.FromValue(name: nameof(component.sharedMaterial),
                     type: typeof(Material),
-                    value: new InstanceID(sharedMaterial.GetInstanceID()))));
+                    value: new ObjectRef(sharedMaterial.GetInstanceID()))));
 
             var result = new Tool_GameObject().Modify(gameObjectDiffs: data.MakeArray(), 
                 gameObjectRefs: new Common.Data.Unity.GameObjectRefList
