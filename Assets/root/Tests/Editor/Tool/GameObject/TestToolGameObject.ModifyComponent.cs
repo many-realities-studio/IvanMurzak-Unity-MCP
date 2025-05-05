@@ -1,4 +1,5 @@
 using System.Collections;
+using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 using com.IvanMurzak.Unity.MCP.Editor.API;
 using com.IvanMurzak.Unity.MCP.Utils;
@@ -23,10 +24,13 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                 .AddProperty(SerializedMember.FromValue(name: nameof(child.transform.position),
                     value: newPosition));
 
-            var result = new Tool_GameObject().ModifyComponent(data, 
-                gameObjectRef: new Common.Data.Unity.GameObjectRef
+            var result = new Tool_GameObject().Modify(values: data.MakeArray(), 
+                gameObjectRefs: new Common.Data.Unity.GameObjectRefList
                 {
-                    instanceID = child.GetInstanceID()
+                    new Common.Data.Unity.GameObjectRef()
+                    {
+                        instanceID = child.GetInstanceID()
+                    }
                 });
             ResultValidation(result);
 
@@ -51,10 +55,13 @@ namespace com.IvanMurzak.Unity.MCP.Editor.Tests
                     type: typeof(Material),
                     value: new InstanceID(sharedMaterial.GetInstanceID())));
 
-            var result = new Tool_GameObject().ModifyComponent(data, 
-                gameObjectRef: new Common.Data.Unity.GameObjectRef
+            var result = new Tool_GameObject().Modify(values: data.MakeArray(), 
+                gameObjectRefs: new Common.Data.Unity.GameObjectRefList
                 {
-                    instanceID = go.GetInstanceID()
+                    new Common.Data.Unity.GameObjectRef()
+                    {
+                        instanceID = go.GetInstanceID()
+                    }
                 });
             ResultValidation(result);
 

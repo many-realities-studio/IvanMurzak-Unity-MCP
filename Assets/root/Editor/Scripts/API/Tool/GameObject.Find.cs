@@ -4,6 +4,7 @@ using System.Linq;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Unity;
 using com.IvanMurzak.Unity.MCP.Utils;
+using UnityEditor.PackageManager;
 
 namespace com.IvanMurzak.Unity.MCP.Editor.API
 {
@@ -23,7 +24,9 @@ Also, it returns Components preview just for the target GameObject.")]
         (
             GameObjectRef gameObjectRef,
             [Description("Determines the depth of the hierarchy to include. 0 - means only the target GameObject. 1 - means to include one layer below.")]
-            int includeChildrenDepth = 0
+            int includeChildrenDepth = 0,
+            [Description("If true, it will print only brief data of the target GameObject.")]
+            bool briefData = false
         )
         {
             return MainThread.Run(() =>
@@ -33,20 +36,22 @@ Also, it returns Components preview just for the target GameObject.")]
                 if (error != null)
                     return error;
 
-                var components = go.GetComponents<UnityEngine.Component>();
-                var componentsPreview = components
-                    .Select((c, i) => Serializer.Serialize(c, name: $"[{i}]", recursive: false))
-                    .ToList();
-
+                var serializedGo = Serializer.Serialize(go, name: go.name, recursive: !briefData);
+                var json = JsonUtils.Serialize(serializedGo);
                 return @$"[Success] Found GameObject.
-# Components preview (to get full information use 'GameObject_GetComponents' tool):
-{JsonUtils.Serialize(componentsPreview)}
+# Data:
+```json
+{JsonUtils.Serialize(serializedGo)}
+```
 
-# GameObject bounds:
+# Bounds:
+```json
 {JsonUtils.Serialize(go.CalculateBounds())}
+```
 
-# GameObject information:
-{go.ToMetadata(includeChildrenDepth).Print()}";
+# Hierarchy:
+{go.ToMetadata(includeChildrenDepth).Print()}
+";
             });
         }
     }

@@ -8,6 +8,10 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     public partial class RS_UnityEngineRenderer : RS_UnityEngineObject<UnityEngine.Renderer>
     {
         protected override IEnumerable<string> ignoredProperties => base.ignoredProperties
-            .Concat(new[] { "material", "materials" });
+            .Concat(new[]
+            {
+                nameof(UnityEngine.Renderer.material),
+                nameof(UnityEngine.Renderer.materials)
+            });
     }
 }
