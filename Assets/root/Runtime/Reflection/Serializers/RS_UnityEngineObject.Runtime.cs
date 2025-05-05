@@ -2,7 +2,7 @@
 #if !UNITY_EDITOR
 using System;
 using System.Reflection;
-using com.IvanMurzak.Unity.MCP.Common;
+using System.Text;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Utils
