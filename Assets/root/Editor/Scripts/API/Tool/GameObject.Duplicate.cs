@@ -21,16 +21,16 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [Description(@"Duplicate GameObjects in opened Prefab or in a Scene.")]
         public string Duplicate
         (
-            GameObjectRef[] gameObjectRefs
+            GameObjectRefList gameObjectRefs
         )
         {
             return MainThread.Run(() =>
             {
                 var prefabStage = PrefabStageUtility.GetCurrentPrefabStage();
 
-                var gos = new List<GameObject>(gameObjectRefs.Length);
+                var gos = new List<GameObject>(gameObjectRefs.Count);
 
-                for (int i = 0; i < gameObjectRefs.Length; i++)
+                for (int i = 0; i < gameObjectRefs.Count; i++)
                 {
                     var gameObjectRef = gameObjectRefs[i];
                     var go = GameObjectUtils.FindBy(gameObjectRefs[i], out var error);

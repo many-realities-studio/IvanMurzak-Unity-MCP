@@ -17,15 +17,14 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
 Returns list of all available components preview if no requested components found.")]
         public Task<CallToolResponse> GetComponents
         (
-            [Description("The 'instanceID' array of the target components. Leave it empty if all components needed.")]
-            int[] componentInstanceIDs,
-            GameObjectRef gameObjectRef
+            GameObjectRef gameObjectRef,
+            ComponentRefList? filterComponents = null
         )
         {
             return ToolRouter.Call("GameObject_GetComponents", arguments =>
             {
-                arguments[nameof(componentInstanceIDs)] = componentInstanceIDs;
                 arguments[nameof(gameObjectRef)] = gameObjectRef;
+                arguments[nameof(filterComponents)] = filterComponents ?? new();
             });
         }
     }

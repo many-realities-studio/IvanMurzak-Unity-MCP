@@ -16,7 +16,7 @@ namespace com.IvanMurzak.Unity.MCP.Server.API
         [Description(@"Duplicate GameObjects in opened Prefab and in a Scene by 'instanceID' (int) array.")]
         public Task<CallToolResponse> Duplicate
         (
-            GameObjectRef[] gameObjectRefs
+            GameObjectRefList gameObjectRefs
         )
         {
             return ToolRouter.Call("GameObject_Duplicate", arguments =>
