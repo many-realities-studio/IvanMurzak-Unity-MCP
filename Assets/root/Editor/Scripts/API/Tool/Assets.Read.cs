@@ -11,9 +11,9 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [McpPluginTool
         (
             "Assets_Read",
-            Title = "Read asset file content",
-            Description = @"Read file asset in the project."
+            Title = "Read asset file content"
         )]
+        [Description(@"Read file asset in the project.")]
         public string Read
         (
             [Description("Path to the asset. See 'Assets_Search' for more details. Starts with 'Assets/'. Priority: 1. (Recommended)")]
@@ -36,7 +36,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
             if (asset == null)
                 return Error.NotFoundAsset(assetPath, assetGuid);
 
-            var serialized = Serializer.Anything.Serialize(asset, name: asset.name, recursive: true);
+            var serialized = Serializer.Serialize(asset, name: asset.name, recursive: true);
             var json = JsonUtils.Serialize(serialized);
 
             return $"[Success] Loaded asset at path '{assetPath}'.\n{json}";

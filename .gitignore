@@ -62,3 +62,7 @@ Assets/root/Server/com.IvanMurzak.Unity.MCP.Server.sln.meta
 
 # Unity Editor layouts
 UserSettings/Layouts/*
+
+# Unity Render cache
+kernelsCache/*
+

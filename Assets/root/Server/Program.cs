@@ -1,4 +1,4 @@
-﻿#if !IGNORE
+﻿#if !UNITY_ENV
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -24,6 +24,7 @@ namespace com.IvanMurzak.Unity.MCP.Server
             {
                 var builder = WebApplication.CreateBuilder(args);
 
+                builder.Logging.AddFilter("Microsoft.AspNetCore.SignalR", LogLevel.Information);
                 builder.Services.AddSignalR(configure =>
                 {
                     configure.EnableDetailedErrors = true;
@@ -72,12 +73,11 @@ namespace com.IvanMurzak.Unity.MCP.Server
                         {
 
                         });
-                });
-
-                // builder.WebHost.UseUrls(Consts.Hub.DefaultEndpoint);
+                });                // builder.WebHost.UseUrls(Consts.Hub.DefaultEndpoint);
                 builder.WebHost.UseKestrel(options =>
                 {
-                    options.ListenLocalhost(GetPort(args));
+                    // Use ListenAnyIP instead of ListenLocalhost to make the server accessible from Windows host
+                    options.ListenAnyIP(GetPort(args));
                 });
 
                 var app = builder.Build();
@@ -86,12 +86,6 @@ namespace com.IvanMurzak.Unity.MCP.Server
                 // ---------------------------------------------------------------------------
 
                 app.UseRouting();
-                app.MapHub<LocalServer>(Consts.Hub.LocalServer, options =>
-                {
-                    options.Transports = HttpTransports.All;
-                    options.ApplicationMaxBufferSize = 1024 * 1024 * 10; // 10 MB
-                    options.TransportMaxBufferSize = 1024 * 1024 * 10; // 10 MB
-                });
                 app.MapHub<RemoteApp>(Consts.Hub.RemoteApp, options =>
                 {
                     options.Transports = HttpTransports.All;
