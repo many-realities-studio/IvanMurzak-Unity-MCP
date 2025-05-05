@@ -19,9 +19,8 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [Description("Destroy one or many components from target GameObject.")]
         public string DestroyComponents
         (
-            [Description("The 'instanceID' array of the target components.")]
-            int[] componentInstanceIDs,
-            GameObjectRef gameObjectRef
+            GameObjectRef gameObjectRef,
+            ComponentRefList destroyComponentRefs
         )
         => MainThread.Run(() =>
         {
@@ -35,18 +34,16 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
             var allComponents = go.GetComponents<UnityEngine.Component>();
             foreach (var component in allComponents)
             {
-                var componentFullName = component.GetType().FullName;
-                var componentInstanceID = component.GetInstanceID();
-                if (componentInstanceIDs.Contains(componentInstanceID))
+                if (destroyComponentRefs.Any(cr => cr.Matches(component)))
                 {
                     UnityEngine.Object.DestroyImmediate(component);
                     destroyCounter++;
-                    stringBuilder.AppendLine($"[Success] Destroyed component instanceID='{componentInstanceID}', type='{componentFullName}'.");
+                    stringBuilder.AppendLine($"[Success] Destroyed component instanceID='{component.GetInstanceID()}', type='{component.GetType().FullName}'.");
                 }
             }
 
             if (destroyCounter == 0)
-                return Error.NotFoundComponents(componentInstanceIDs, allComponents);
+                return Error.NotFoundComponents(destroyComponentRefs, allComponents);
 
             return $"[Success] Destroyed {destroyCounter} components from GameObject.\n{stringBuilder.ToString()}";
         });

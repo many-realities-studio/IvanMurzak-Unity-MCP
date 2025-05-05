@@ -22,13 +22,16 @@ Also, it returns Components preview just for the target GameObject.")]
         (
             GameObjectRef gameObjectRef,
             [Description("Determines the depth of the hierarchy to include. 0 - means only the target GameObject. 1 - means to include one layer below.")]
-            int includeChildrenDepth = 0
+            int includeChildrenDepth = 0,
+            [Description("If true, it will print only brief data of the target GameObject.")]
+            bool briefData = false
         )
         {
             return ToolRouter.Call("GameObject_Find", arguments =>
             {
                 arguments[nameof(gameObjectRef)] = gameObjectRef;
                 arguments[nameof(includeChildrenDepth)] = includeChildrenDepth;
+                arguments[nameof(briefData)] = briefData;
             });
         }
     }

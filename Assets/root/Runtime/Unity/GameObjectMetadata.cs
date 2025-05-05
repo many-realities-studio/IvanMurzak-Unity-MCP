@@ -12,6 +12,7 @@ namespace com.IvanMurzak.Unity.MCP
         public int instanceID;
         public string path;
         public string name;
+        public string sceneName;
         public string tag;
         public bool activeSelf;
         public bool activeInHierarchy;
@@ -22,6 +23,7 @@ namespace com.IvanMurzak.Unity.MCP
             var sb = new StringBuilder();
 
             // Add table header
+            sb.AppendLine("Scene: " + sceneName);
             sb.AppendLine("Path to root: " + path);
             sb.AppendLine("-------------------------------------------------------------------------");
             sb.AppendLine("instanceID | activeInHierarchy | activeSelf | tag       | name");
@@ -71,6 +73,7 @@ namespace com.IvanMurzak.Unity.MCP
                 instanceID = go.GetInstanceID(),
                 path = go.GetPath(),
                 name = go.name,
+                sceneName = go.scene.name,
                 tag = go.tag,
                 activeSelf = go.activeSelf,
                 activeInHierarchy = go.activeInHierarchy

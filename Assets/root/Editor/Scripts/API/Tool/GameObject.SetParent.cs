@@ -18,7 +18,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
         [Description(@"Set GameObjects in opened Prefab or in a Scene by 'instanceID' (int) array.")]
         public string SetParent
         (
-            GameObjectRef[] gameObjectRefs,
+            GameObjectRefList gameObjectRefs,
             GameObjectRef parentGameObjectRef,
             [Description("A boolean flag indicating whether the GameObject's world position should remain unchanged when setting its parent.")]
             bool worldPositionStays = true
@@ -29,7 +29,7 @@ namespace com.IvanMurzak.Unity.MCP.Editor.API
                 var stringBuilder = new StringBuilder();
                 int changedCount = 0;
 
-                for (var i = 0; i < gameObjectRefs.Length; i++)
+                for (var i = 0; i < gameObjectRefs.Count; i++)
                 {
                     var targetGo = GameObjectUtils.FindBy(gameObjectRefs[i], out var error);
                     if (error != null)

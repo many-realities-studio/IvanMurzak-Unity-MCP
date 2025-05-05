@@ -8,6 +8,9 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     public partial class RS_UnityEngineMeshFilter : RS_UnityEngineObject<UnityEngine.MeshFilter>
     {
         protected override IEnumerable<string> ignoredProperties => base.ignoredProperties
-            .Concat(new[] { "mesh" });
+            .Concat(new[]
+            {
+                nameof(UnityEngine.MeshFilter.mesh)
+            });
     }
 }

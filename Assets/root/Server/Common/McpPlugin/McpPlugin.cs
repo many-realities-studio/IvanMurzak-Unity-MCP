@@ -14,14 +14,13 @@ namespace com.IvanMurzak.Unity.MCP.Common
 
         readonly ILogger<McpPlugin> _logger;
         readonly IRpcRouter _rpcRouter;
-        readonly IRemoteServer _remoteServer;
         readonly CompositeDisposable _disposables = new();
 
         public IMcpRunner McpRunner { get; private set; }
         public ReadOnlyReactiveProperty<HubConnectionState> ConnectionState => _rpcRouter.ConnectionState;
         public ReadOnlyReactiveProperty<bool> KeepConnected => _rpcRouter.KeepConnected;
 
-        public McpPlugin(ILogger<McpPlugin> logger, IRpcRouter rpcRouter, IMcpRunner mcpRunner, IRemoteServer remoteServer)
+        public McpPlugin(ILogger<McpPlugin> logger, IRpcRouter rpcRouter, IMcpRunner mcpRunner)
         {
             _logger = logger ?? throw new ArgumentNullException(nameof(logger));
             _logger.LogTrace("{0} Ctor. Version: {Version}", typeof(McpPlugin).Name, Version);
@@ -35,7 +34,7 @@ namespace com.IvanMurzak.Unity.MCP.Common
                 .Where(state => state == HubConnectionState.Connected)
                 .Subscribe(state =>
                 {
-                    _remoteServer.NotifyAboutUpdatedTools(_disposables.ToCancellationToken());
+                    _rpcRouter.NotifyAboutUpdatedTools(_disposables.ToCancellationToken());
                 }).AddTo(_disposables);
 
             if (HasInstance)
@@ -45,6 +44,12 @@ namespace com.IvanMurzak.Unity.MCP.Common
             }
 
             _instance.Value = this;
+
+            // Dispose if another instance is created, because only one instance is allowed.
+            _instance
+                .Where(instance => instance != this)
+                .Subscribe(instance => Dispose())
+                .AddTo(_disposables);
         }
 
         public Task<bool> Connect(CancellationToken cancellationToken = default)
@@ -73,9 +78,6 @@ namespace com.IvanMurzak.Unity.MCP.Common
             try
             {
                 await _rpcRouter.DisposeAsync();
-
-                if (localInstance != null)
-                    await localInstance.DisposeAsync();
             }
             catch (Exception ex)
             {

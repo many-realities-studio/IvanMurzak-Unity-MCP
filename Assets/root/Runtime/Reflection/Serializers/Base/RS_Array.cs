@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
@@ -52,12 +53,12 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
         protected override bool SetValue(ref object obj, Type type, JsonElement? value)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.Value.GetRawText());
+            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.Value);
             var enumerable = parsedList
                 .Select(element =>
                 {
                     var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
+                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value, elementType);
                     return elementValue;
                 });
 
@@ -67,46 +68,50 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             return true;
         }
 
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement?.GetRawText());
+            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement.Value);
             var enumerable = parsedList
                 .Select(element =>
                 {
                     var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
+                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value, elementType);
                     return elementValue;
                 });
 
             fieldInfo.SetValue(obj, type.IsArray
                 ? enumerable.ToArray()
                 : enumerable.ToList());
+
+            stringBuilder?.AppendLine($"[Success] Field '{value.name}' modified to '[{string.Join(", ", enumerable)}]'.");
             return true;
         }
 
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement?.GetRawText());
+            var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement.Value);
             var enumerable = parsedList
                 .Select(element =>
                 {
                     var elementType = TypeUtils.GetType(element.type);
-                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value.GetRawText(), elementType);
+                    var elementValue = JsonUtils.Deserialize(element.valueJsonElement.Value, elementType);
                     return elementValue;
                 });
 
             propertyInfo.SetValue(obj, type.IsArray
                 ? enumerable.ToArray()
                 : enumerable.ToList());
+
+            stringBuilder?.AppendLine($"[Success] Property '{value.name}' modified to '{enumerable}'.");
             return true;
         }
 
         public override bool SetField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedValue = JsonUtils.Deserialize(value.valueJsonElement?.GetRawText(), type);
+            var parsedValue = JsonUtils.Deserialize(value.valueJsonElement.Value, type);
             fieldInfo.SetValue(obj, parsedValue);
             return true;
         }
@@ -114,7 +119,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
         public override bool SetProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
-            var parsedValue = JsonUtils.Deserialize(value.valueJsonElement?.GetRawText(), type);
+            var parsedValue = JsonUtils.Deserialize(value.valueJsonElement.Value, type);
             propertyInfo.SetValue(obj, parsedValue);
             return true;
         }

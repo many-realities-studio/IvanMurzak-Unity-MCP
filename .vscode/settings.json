@@ -66,9 +66,16 @@
     "explorer.fileNesting.patterns": {
         "*.sln": "*.csproj"
     },
-    "dotnet.defaultSolution": "IvanMurzak-Unity-MCP.sln",
+    "dotnet.defaultSolution": "Unity-MCP.sln",
     "cSpell.words": [
+        "aspnetcore",
+        "codeanalysis",
+        "dependencyinjection",
+        "ivanmurzak",
         "Murzak",
-        "playmode"
+        "openupm",
+        "playmode",
+        "signalr",
+        "uielements"
     ]
 }

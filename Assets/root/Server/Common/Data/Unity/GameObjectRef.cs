@@ -5,7 +5,7 @@ using System.Text.Json.Serialization;
 namespace com.IvanMurzak.Unity.MCP.Common.Data.Unity
 {
     [Description(@"GameObject reference. Used to find GameObject in opened Prefab or in a Scene.
-Use one of the following properties to find GameObject:
+Use one of the following properties:
 1. 'instanceID' (int) - recommended. It finds the exact GameObject.
 2. 'path' (string) - finds GameObject by path. It may find a wrong GameObject.
 3. 'name' (string) - finds GameObject by name. It may find a wrong GameObject.")]
