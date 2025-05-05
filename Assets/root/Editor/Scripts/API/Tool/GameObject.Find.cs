@@ -31,7 +31,6 @@ Also, it returns Components preview just for the target GameObject.")]
         {
             return MainThread.Run(() =>
             {
-                // Find by 'instanceID' first, then by 'path', then by 'name'
                 var go = GameObjectUtils.FindBy(gameObjectRef, out var error);
                 if (error != null)
                     return error;
