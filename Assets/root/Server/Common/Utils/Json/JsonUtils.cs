@@ -43,6 +43,9 @@ namespace com.IvanMurzak.Unity.MCP.Common
         public static T? Deserialize<T>(JsonElement jsonElement, JsonSerializerOptions? options = null)
             => JsonSerializer.Deserialize<T>(jsonElement, options ?? jsonSerializerOptions);
 
+        public static object? Deserialize(JsonElement jsonElement, Type type, JsonSerializerOptions? options = null)
+            => JsonSerializer.Deserialize(jsonElement, type, options ?? jsonSerializerOptions);
+
         public static object? Deserialize(string json, Type type, JsonSerializerOptions? options = null)
             => JsonSerializer.Deserialize(json, type, options ?? jsonSerializerOptions);
 

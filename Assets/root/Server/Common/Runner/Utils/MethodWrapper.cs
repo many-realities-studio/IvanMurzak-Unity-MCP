@@ -148,7 +148,7 @@ namespace com.IvanMurzak.Unity.MCP.Common.MCP
                     // Handle JsonElement conversion
                     if (parameters[i] is JsonElement jsonElement)
                     {
-                        finalParameters[i] = JsonUtils.Deserialize(jsonElement.GetRawText(), methodParameters[i].ParameterType);
+                        finalParameters[i] = JsonUtils.Deserialize(jsonElement, methodParameters[i].ParameterType);
                     }
                     else
                     {
@@ -187,7 +187,7 @@ namespace com.IvanMurzak.Unity.MCP.Common.MCP
                 {
                     if (value is JsonElement jsonElement)
                     {
-                        finalParameters[i] = JsonUtils.Deserialize(jsonElement.GetRawText(), methodParameters[i].ParameterType);
+                        finalParameters[i] = JsonUtils.Deserialize(jsonElement, methodParameters[i].ParameterType);
                     }
                     else
                     {
