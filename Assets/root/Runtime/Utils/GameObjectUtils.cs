@@ -36,7 +36,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 go = FindByInstanceID(instanceID.Value);
                 if (go == null)
                 {
-                    error = $"[Error] Not found GameObject witn instanceID '{instanceID.Value}'";
+                    error = $"[Error] Not found GameObject with instanceID '{instanceID.Value}'";
                     return null;
                 }
             }

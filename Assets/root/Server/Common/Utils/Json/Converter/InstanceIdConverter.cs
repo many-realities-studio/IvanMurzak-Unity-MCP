@@ -6,14 +6,14 @@ using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
 
 namespace com.IvanMurzak.Unity.MCP.Common.Json
 {
-    public class InstanceIDConverter : JsonConverter<InstanceID>
+    public class InstanceIDConverter : JsonConverter<ObjectRef>
     {
-        public override InstanceID? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override ObjectRef? Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             if (reader.TokenType == JsonTokenType.Null)
                 return null;
 
-            var instanceID = new InstanceID();
+            var instanceID = new ObjectRef();
 
             while (reader.Read())
             {
@@ -30,6 +30,9 @@ namespace com.IvanMurzak.Unity.MCP.Common.Json
                         case "instanceID":
                             instanceID.instanceID = reader.GetInt32();
                             break;
+                        case "assetPath":
+                            instanceID.assetPath = reader.GetString();
+                            break;
                         default:
                             // Skip unknown properties
                             reader.Skip();
@@ -41,7 +44,7 @@ namespace com.IvanMurzak.Unity.MCP.Common.Json
             return instanceID;
         }
 
-        public override void Write(Utf8JsonWriter writer, InstanceID value, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, ObjectRef value, JsonSerializerOptions options)
         {
             if (value == null)
             {
@@ -51,9 +54,16 @@ namespace com.IvanMurzak.Unity.MCP.Common.Json
 
             writer.WriteStartObject();
 
-            // Write the "id" property
+            // Write the "instanceID" property
             writer.WritePropertyName("instanceID");
             writer.WriteNumberValue(value.instanceID);
+
+            // Write the "assetPath" property
+            if (!string.IsNullOrEmpty(value.assetPath))
+            {
+                writer.WritePropertyName("assetPath");
+                writer.WriteStringValue(value.assetPath);
+            }
 
             writer.WriteEndObject();
         }

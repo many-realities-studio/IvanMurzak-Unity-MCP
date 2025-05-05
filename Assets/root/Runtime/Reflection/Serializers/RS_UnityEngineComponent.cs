@@ -8,6 +8,10 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     public partial class RS_UnityEngineComponent : RS_UnityEngineObject<UnityEngine.Component>
     {
         protected override IEnumerable<string> ignoredProperties => base.ignoredProperties
-            .Concat(new[] { "gameObject" });
+            .Concat(new[]
+            {
+                nameof(UnityEngine.Component.gameObject),
+                nameof(UnityEngine.Component.transform)
+            });
     }
 }

@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text;
 using System.Text.Json;
 using com.IvanMurzak.Unity.MCP.Common;
 using com.IvanMurzak.Unity.MCP.Common.Data.Utils;
@@ -67,7 +68,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             return true;
         }
 
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement?.GetRawText());
@@ -82,10 +83,12 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             fieldInfo.SetValue(obj, type.IsArray
                 ? enumerable.ToArray()
                 : enumerable.ToList());
+
+            stringBuilder?.AppendLine($"[Success] Field '{value.name}' modified to '[{string.Join(", ", enumerable)}]'.");
             return true;
         }
 
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             var parsedList = JsonUtils.Deserialize<List<SerializedMember>>(value.valueJsonElement?.GetRawText());
@@ -100,6 +103,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             propertyInfo.SetValue(obj, type.IsArray
                 ? enumerable.ToArray()
                 : enumerable.ToList());
+
+            stringBuilder?.AppendLine($"[Success] Property '{value.name}' modified to '{enumerable}'.");
             return true;
         }
 

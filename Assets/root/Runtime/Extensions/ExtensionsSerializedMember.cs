@@ -6,19 +6,8 @@ namespace com.IvanMurzak.Unity.MCP.Utils
     public static class ExtensionsSerializedMember
     {
         public static int GetInstanceID(this SerializedMember member)
-            => member.GetValue<InstanceID>()?.instanceID
-                ?? member.GetField("instanceID")?.GetValue<int>()
-                ?? 0;
-        public static bool GetIndexFromName(this SerializedMember member, out int index)
-        {
-            if (HasIndexName(member) == false)
-            {
-                index = -1;
-                return false;
-            }
-            return int.TryParse(member.name.Substring(1, member.name.Length - 2), out index);
-        }
-        public static bool HasIndexName(this SerializedMember member)
-            => member.name?.Length >= 3 && member.name[0] == '[' && member.name[^1] == ']';
+            => member.GetValue<ObjectRef>()?.instanceID
+            ?? member.GetField("instanceID")?.GetValue<int>()
+            ?? 0;        
     }
 }

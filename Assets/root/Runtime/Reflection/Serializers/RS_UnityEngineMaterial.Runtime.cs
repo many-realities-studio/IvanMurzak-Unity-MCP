@@ -66,13 +66,13 @@ namespace com.IvanMurzak.Unity.MCP.Utils
             }
         }
 
-        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value,
+        public override bool SetAsField(ref object obj, Type type, FieldInfo fieldInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             return false;
         }
 
-        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value,
+        public override bool SetAsProperty(ref object obj, Type type, PropertyInfo propertyInfo, SerializedMember? value, StringBuilder? stringBuilder = null,
             BindingFlags flags = BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic)
         {
             return false;

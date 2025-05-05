@@ -22,6 +22,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
 
                 // Components
                 Add(new RS_UnityEngineObject());
+                Add(new RS_UnityEngineGameObject());
                 Add(new RS_UnityEngineComponent());
                 Add(new RS_UnityEngineTransform());
                 Add(new RS_UnityEngineRenderer());
