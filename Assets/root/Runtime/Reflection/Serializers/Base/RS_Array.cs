@@ -84,7 +84,7 @@ namespace com.IvanMurzak.Unity.MCP.Utils
                 ? enumerable.ToArray()
                 : enumerable.ToList());
 
-            stringBuilder?.AppendLine($"[Success] Field '{value.name}' modified to '{enumerable}'.");
+            stringBuilder?.AppendLine($"[Success] Field '{value.name}' modified to '[{string.Join(", ", enumerable)}]'.");
             return true;
         }
 
